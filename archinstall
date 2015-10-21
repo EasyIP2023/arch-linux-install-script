@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#First ping to see if you have connection
+#Format and mount drive (make a boot partition or not)
+
+cgdisk /dev/sda
+mkfs.ext4 /dev/sda1
+mkswap /dev/sda2
+swapon /dev/sda2
+mount /dev/sda1 /mnt
+
+#Uncomment a mirror
+nano /etc/pacman.d/mirrorlist
+
+#install base system
+pacstrap -i /mnt base base-devel
+genfstab -U -p /mnt >> /mnt/etc/fstab
+arch-chroot /mnt ./secondpart
+umount -R /mnt
+reboot

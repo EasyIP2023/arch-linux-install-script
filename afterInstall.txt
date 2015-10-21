@@ -1,0 +1,5 @@
+Stuff to do after install
+
+ip link
+systemctl stop dhcpcd@NAME-OF-THE-NETWORK.service
+systemctl enable gdm.service
