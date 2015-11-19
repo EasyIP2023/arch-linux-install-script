@@ -15,6 +15,7 @@ hwclock --systohc --utc
 echo phantom > /etc/hostname
 
 #uncomment Include=/etc/pacman.d/mirrorlist
+nano /etc/pacman.conf
 
 #Installing Blackarch linux
 wget -O /tmp/strap.sh http://blackarch.org/strap.sh
@@ -22,8 +23,6 @@ cd /tmp
 chmod 777 strap.sh
 ./strap.sh
 
-nano /etc/pacman.conf
-pacman -Syy
 pacman -S blackarch --force
 
 passwd
@@ -49,6 +48,12 @@ pacman -S lib32-mesa-libgl
 pacman -S firefox
 pacman -S libreoffice
 pacman -S vim
+pacman -S sublime-text
+pacman -S eclipse-java
+pacman -S bleachbit
+
+#install Java
+pacman -S jre7-openjdk-headless jre7-openjdk jdk7-openjdk openjdk7-doc openjdk7-src jre8-openjdk-headless jre8-openjdk jdk8-openjdk openjdk8-doc openjdk8-src java-openjfx java-openjfx-doc java-openjfx-src
 
 #install networkmanager
 pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog gnome-keyring
