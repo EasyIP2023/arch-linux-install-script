@@ -1,6 +1,16 @@
 
 #!/bin/bash
 
+#Installing Blackarch linux
+wget -O /tmp/strap.sh http://blackarch.org/strap.sh
+cd /tmp
+chmod 777 strap.sh
+./strap.sh
+
+#clean it uo
+rm strap.sh
+cd ..
+
 #Uncomment the language 
 nano /etc/locale.gen
 locale-gen
@@ -37,6 +47,9 @@ pacman -S xf86-input-synaptics
 pacman -S xorg-server xorg-server-utils xorg-xinit xorg-twm xorg-xclock xterm 
 pacman -S mesa
 pacman -S lib32-mesa-libgl
+pacman -S firefox
+pacman -S libreoffice
+pacman -S vim
 
 #install networkmanager
 pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog gnome-keyring
