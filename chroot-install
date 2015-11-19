@@ -1,16 +1,6 @@
 
 #!/bin/bash
 
-#Installing Blackarch linux
-wget -O /tmp/strap.sh http://blackarch.org/strap.sh
-cd /tmp
-chmod 777 strap.sh
-./strap.sh
-
-#clean it uo
-rm strap.sh
-cd ..
-
 #Uncomment the language 
 nano /etc/locale.gen
 locale-gen
@@ -25,8 +15,17 @@ hwclock --systohc --utc
 echo phantom > /etc/hostname
 
 #uncomment Include=/etc/pacman.d/mirrorlist
+
+#Installing Blackarch linux
+wget -O /tmp/strap.sh http://blackarch.org/strap.sh
+cd /tmp
+chmod 777 strap.sh
+./strap.sh
+
 nano /etc/pacman.conf
-pacman -Sy
+pacman -Syy
+pacman -S blackarch --force
+
 passwd
 useradd -m -g users -G wheel,storage,power -s /bin/bash phantom
 passwd phantom
