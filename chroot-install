@@ -52,7 +52,7 @@ pacman -S sublime-text
 pacman -S eclipse-java
 pacman -S bleachbit
 
-#Install yubiPam for authentication
+#Install yubiPam for authentication and yubikey personalization tool
 cd /usr/local/src
 git clone https://github.com/firnsy/yubipam.git
 cd yubipam
@@ -64,7 +64,7 @@ touch /etc/yubikey
 chgrp yubiauth /etc/yubikey /usr/local/sbin/yk_chkpwd
 chmod g+rw /etc/yubikey
 chmod g+s /usr/local/sbin/yk_chkpwd
-
+pacman -S yubikey-personalization-gui
 
 #install Java
 pacman -S jre7-openjdk-headless jre7-openjdk jdk7-openjdk openjdk7-doc openjdk7-src jre8-openjdk-headless jre8-openjdk jdk8-openjdk openjdk8-doc openjdk8-src java-openjfx java-openjfx-doc java-openjfx-src
