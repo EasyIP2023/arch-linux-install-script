@@ -72,6 +72,32 @@ pacman -S jre7-openjdk-headless jre7-openjdk jdk7-openjdk openjdk7-doc openjdk7-
 #install networkmanager
 pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog gnome-keyring
 
+#Proxy list
+echo "#China
+socks5  115.154.138.20  1080
+socks5  120.27.101.186  1080
+socks5  115.28.67.92    8101
+socks5  121.42.44.160   1080
+socks5  115.29.143.109  8888
+
+#Russia
+socks5  67.201.33.70    9100
+
+#Isreal
+socks4  31.154.240.7    1080
+
+
+#Mexico
+socks5  189.219.187.195 10000
+socks5  189.219.254.158 10000
+socks5  189.219.5.20    10000
+socks5  189.219.175.209 10000
+
+#Argentina
+http    190.98.162.22   8080
+
+#Hong Kong
+socks5  121.40.34.139   3128">>/etc/proxychains.conf 
 
 #Install gnome desktop environment 
 sudo pacman -S gnome gnome-extra
