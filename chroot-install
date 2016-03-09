@@ -1,11 +1,12 @@
 
 #!/bin/bash
 
-#Uncomment the language 
+#Uncomment the language
 nano /etc/locale.gen
 locale-gen
 echo LANG=en_US.UTF-8 > /etc/locale.conf
 export LANG=en_US.UTF-8
+
 
 #Change Time
 ln -s /usr/share/zoneinfo/US > /etc/localtime
@@ -35,14 +36,14 @@ EDITOR=nano visudo
 pacman -S bash-completion
 
 #Install grub
-pacman -S grub 
+pacman -S grub
 grub-install --target=i386-pc --recheck /dev/sda
-pacman -S os-prober 
+pacman -S os-prober
 grub-mkconfig -o /boot/grub/grub.cfg
 
 #install some base stuff like graphics (Intel integrated graphics)
-pacman -S xf86-input-synaptics 
-pacman -S xorg-server xorg-server-utils xorg-xinit xorg-twm xorg-xclock xterm 
+pacman -S xf86-input-synaptics
+pacman -S xorg-server xorg-server-utils xorg-xinit xorg-twm xorg-xclock xterm
 pacman -S mesa
 pacman -S lib32-mesa-libgl
 pacman -S firefox
@@ -72,7 +73,7 @@ pacman -S jre7-openjdk-headless jre7-openjdk jdk7-openjdk openjdk7-doc openjdk7-
 #install networkmanager
 pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog gnome-keyring
 
-#Install gnome desktop environment 
+#Install gnome desktop environment
 sudo pacman -S gnome gnome-extra
 sudo pacman -S gnome-tweak-tool
 exit
