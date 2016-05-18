@@ -76,7 +76,7 @@ banner()
   echo "${str}" |
   while IFS= read -r line
   do
-    printf "%s%*s\n%s" "${WHITEB}" $(( (${#line} + columns) / 2)) \
+    printf "%s%*s\n%s" "${YELLOWB}" $(( (${#line} + columns) / 2)) \
       "$line" "${NC}"
   done
   printf "${REDB}%*s${NC}\n\n\n" "${COLUMNS:-$(tput cols)}" | tr ' ' '-'
@@ -359,7 +359,7 @@ ask_cfdisk()
         sync
     else
         echo
-        err "Are you kidding me? No partitions no fun!"
+        err "Are you shiting me? No partitions you FUCK!"
     fi
 
     return $SUCCESS
@@ -634,7 +634,7 @@ umount_filesystems()
 
 # install ArchLinux base and base-devel packages
 install_base_packages(){
-  title "Base System Setup"
+  title "Base System Package Install Setup"
 
   wprintf "[+] Installing ArchLinux base packages"
   printf "\n\n"
@@ -659,7 +659,7 @@ setup_resolvconf(){
 
 # setup fstab
 setup_fstab(){
-  title "Base System Setup"
+  title "Base System fstab Setup"
 
   wprintf "[+] Setting up /etc/fstab"
   printf "\n\n"
@@ -676,7 +676,7 @@ setup_fstab(){
 
 # setup locale and keymap
 setup_locale(){
-  title "Base System Setup"
+  title "Base System TimeZone and Keymap Setup"
 
   wprintf "[+] Setting up default locale (en_US.UTF-8)"
   printf "\n\n"
@@ -742,7 +742,7 @@ setup_bootloader()
 {
   uuid="`blkid ${ROOT_PART} | cut -d ' ' -f 2 | cut -d '"' -f 2`"
 
-  title "Base System Setup"
+  title "Base System BootLoader Setup"
 
   if [ "${PART_LABEL}" = "gpt" ]
   then
@@ -814,7 +814,7 @@ setup_user()
 {
   user="${1}"
 
-  title "Base System Setup"
+  title "Base System User Setup"
 
   wprintf "[+] Setting up ${user} account"
   printf "\n\n"
@@ -980,7 +980,7 @@ setup_base_system()
 # update /etc files
 update_etc()
 {
-    title "Arch Linux Setup"
+    title "Arch Linux Setup (Update /etc files)"
 
     wprintf "[+] Updating /etc files"
     printf "\n\n"
@@ -1002,7 +1002,7 @@ update_etc()
 # setup display manager
 setup_display_manager()
 {
-    title "Arch Linux Setup"
+    title "Arch Linux Display Manager Setup"
 
     wprintf "[+] Setting up gdm display manager"
     printf "\n"
@@ -1036,7 +1036,7 @@ ask_vbox_setup()
 # setup virtualbox utils
 setup_vbox_utils()
 {
-  title "BlackArch Linux Setup"
+  title "Arch Linux VirtualBox Setup"
 
   wprintf "[+] Setting up VirtualBox utils"
   printf "\n\n"
@@ -1073,7 +1073,7 @@ setup_yubiauth(){
 # add user to newly created groups
 update_user_groups()
 {
-    title "Arch Linux Setup"
+    title "Arch Linux User Groups Setup"
 
     wprintf "[+] Adding user '${NORMAL_USER}' to groups"
     printf "\n\n"
