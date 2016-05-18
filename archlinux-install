@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# true / false
+TRUE=0
+FALSE=1
+
+# return codes
+SUCCESS=1337
+FAILURE=31337
+
 #Colors
 WHITE="`tput setaf 7`"
 WHITEB="`tput bold ; tput setaf 7`"
@@ -12,9 +20,17 @@ YELLOWB="`tput bold ; tput setaf 3`"
 BLINK="`tput blink`"
 NC="`tput sgr0`"
 
-# return codes
-SUCCESS=1337
-FAILURE=31337
+# chosen keymap
+KEYMAP=""
+
+# set keymap
+SET_KEYMAP="1"
+
+# list keymaps
+LIST_KEYMAP="2"
+
+# hostname
+HOST_NAME=""
 
 # LUKS flag
 LUKS=""
@@ -42,6 +58,18 @@ SWAP_PART=""
 
 # boot fs type - default: ext4
 BOOT_FS_TYPE=""
+
+# root fs type - default: ext4
+ROOT_FS_TYPE=""
+
+# chroot directory
+CHROOT="/mnt"
+
+# VirtualBox setup - default: false
+VBOX_SETUP=$FALSE
+
+# normal system user
+NORMAL_USER=""
 
 # print formatted output
 wprintf(){
@@ -84,8 +112,7 @@ banner()
 }
 
 # sleep and clear
-sleep_clear()
-{
+sleep_clear(){
     sleep $1
     clear
 
@@ -319,7 +346,6 @@ ask_hd_dev(){
       echo "    > ${i}"
     done
     echo
-    get_hd_devs
     wprintf "[?] Please choose a device: "
     read HD_DEV  title "Hard Drive Setup"
 
