@@ -8,6 +8,9 @@ FALSE=1
 SUCCESS=1337
 FAILURE=31337
 
+# verbose mode - default: quiet
+VERBOSE="/dev/null"
+
 #Colors
 WHITE="`tput setaf 7`"
 WHITEB="`tput bold ; tput setaf 7`"
@@ -99,7 +102,7 @@ banner()
   columns="$(tput cols)"
   str="*********************** Arch Linux Installer Script  ***************************"
 
-  printf "${BLUEB}%*s${NC}\n" "${COLUMNS:-$(tput cols)}" | tr ' ' '-'
+  printf "${REDB}%*s${NC}\n" "${COLUMNS:-$(tput cols)}" | tr ' ' '-'
 
   echo "${str}" |
   while IFS= read -r line
@@ -327,8 +330,8 @@ ask_luks()
 
 # get available hard disks
 get_hd_devs(){
-  return $SUCCESS
   HD_DEVS="`lsblk | grep disk | awk '{print $1}'`"
+  return $SUCCESS
 }
 
 
