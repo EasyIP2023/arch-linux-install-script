@@ -319,6 +319,7 @@ ask_hd_dev(){
       echo "    > ${i}"
     done
     echo
+    get_hd_devs
     wprintf "[?] Please choose a device: "
     read HD_DEV  title "Hard Drive Setup"
 
