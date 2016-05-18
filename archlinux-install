@@ -334,23 +334,11 @@ get_hd_devs(){
   return $SUCCESS
 }
 
-
 # ask user for device to format and setup
 ask_hd_dev(){
   while true
   do
     title "Hard Drive Setup"
-
-    wprintf "[+] Available hard drives for installation:"
-    printf "\n\n"
-
-    for i in ${HD_DEVS}
-    do
-      echo "    > ${i}"
-    done
-    echo
-    wprintf "[?] Please choose a device: "
-    read HD_DEV  title "Hard Drive Setup"
 
     wprintf "[+] Available hard drives for installation:"
     printf "\n\n"
@@ -369,17 +357,11 @@ ask_hd_dev(){
       break
     fi
     clear
-    if echo ${HD_DEVS} | grep "\<${HD_DEV}\>" > /dev/null
-    then
-      HD_DEV="/dev/${HD_DEV}"
-      clear
-      break
-    fi
-    clear
   done
 
   return $SUCCESS
 }
+
 # ask user to create partitions using cfdisk
 ask_cfdisk()
 {
@@ -805,7 +787,7 @@ EOF
 
       if [ -f "data/splash.png" ]
       then
-          cp pics/splash.png "${CHROOT}/boot/grub/splash.png"
+          cp data/splash.png "${CHROOT}/boot/grub/splash.png"
       else
           cp /usr/share/Arch_Linu-install-script/data/splash.png \
               "${CHROOT}/boot/grub/splash.png"
@@ -815,7 +797,7 @@ EOF
           sed -i "s|quiet|cryptdevice=${ROOT_PART}:${CRYPT_ROOT} root=/dev/mapper/${CRYPT_ROOT}|" "${CHROOT}/etc/default/grub"
       fi
       sed -i 's/quiet//g' "${CHROOT}/etc/default/grub"
-      sed -i 's/Arch/BlackArch/g' "${CHROOT}/etc/default/grub"
+      sed -i 's/Arch//g' "${CHROOT}/etc/default/grub"
       echo "GRUB_BACKGROUND=\"/boot/grub/splash.png\"" >> \
           "${CHROOT}/etc/default/grub"
       chroot ${CHROOT} grub-install --target=i386-pc "${HD_DEV}"
