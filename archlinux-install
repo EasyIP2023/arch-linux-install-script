@@ -865,7 +865,7 @@ setup_extra_packages(){
 
     browser="firefox midori elinks"
 
-    editor="vim"
+    editor="vim eclipse-java"
 
     filesystem="btrfs-progs cryptsetup device-mapper dmraid dosfstools
     gptfdisk nilfs-utils ntfs-3g partclone parted partimage"
@@ -880,7 +880,7 @@ setup_extra_packages(){
     ctags expac feh git gpm grml-zsh-config haveged hdparm htop
     inotify-tools ipython irssi linux-atm lsof mercurial mesa mlocate moreutils
     mpv mtools mupdf p7zip rsync rtorrent scrot smartmontools speedtouch strace
-    sudo tzdata unace unrar unzip usb_modeswitch zip zsh eclipse-java sublime-text sublime-text"
+    sudo tzdata unace unrar unzip usb_modeswitch zip zsh"
 
     network="bridge-utils darkhttpd atftp bind-tools dnsmasq
     dhclient dnsutils gnu-netcat ipw2100-fw ipw2200-fw lftp nfs-utils ntp
@@ -925,7 +925,7 @@ setup_extra_packages(){
     sleep 2
 
     chroot ${CHROOT} pacman -S --needed --force --noconfirm `echo ${all}`
-
+    chroot ${CHROOT} systemctl enable networkmanager
     return $SUCCESS
 }
 
@@ -1084,6 +1084,38 @@ update_user_groups()
     return $SUCCESS
 }
 
+setup_ruby_on_rails(){
+  title 'Rails Setup'
+  chroot ${CHROOT} gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+  chroot ${CHROOT} \curl -sSL https://get.rvm.io | bash
+  chroot ${CHROOT} source ${HOME}/.rvm/scripts/rvm
+  chroot ${CHROOT} rvm install ruby 2.2.2
+  chroot ${CHROOT} rvm install rails
+  chroot ${CHROOT} rvm install bundler
+}
+
+setup_extra_config(){
+  chroot ${CHROOT} echo "colo default
+  syntax enable
+  set ts=2
+  set number
+  set smartindent
+  set shiftwidth=2
+  filetype plugin indent on
+  set autoread
+  set smartcase
+  set hlsearch
+  set incsearch
+  set showmatch
+  set noerrorbells
+  set novisualbell
+  set tm=500
+  set nobackup
+  set nowb
+  set noswapfile
+  set smarttab" >> ${HOME}/.vimrc
+}
+
 # controller and program flow
 main()
 {
@@ -1126,9 +1158,15 @@ main()
     setup_base_system
     sleep_clear 1
 
+    #extra
+    setup_extra_config
+    setup_ruby_on_rails
+    sleep_clear 1
+
     # epilog
     umount_filesystems
     sleep_clear 1
+
     printf "Installation successfull"
 
     return $SUCCESS
