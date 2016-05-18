@@ -69,9 +69,9 @@ err(){
 banner()
 {
   columns="$(tput cols)"
-  str="--==[ Arch Linux Installer (Major Credit goes to the BlackArch Linux Team)]==--"
+  str="*********************** Arch Linux Installer Script  ***************************"
 
-  printf "${REDB}%*s${NC}\n" "${COLUMNS:-$(tput cols)}" | tr ' ' '-'
+  printf "${BLUEB}%*s${NC}\n" "${COLUMNS:-$(tput cols)}" | tr ' ' '-'
 
   echo "${str}" |
   while IFS= read -r line
@@ -251,10 +251,7 @@ update_pkg_database()
 
 # update pacman.conf and database
 update_pacman(){
-  title "Network Setup"
-  wprintf "[?] Set your hostname: "
-  read HOST_NAME
-  clear
+  title "Update Pacman"
   enable_pacman_multilib
   sleep_clear 1
 
@@ -757,18 +754,18 @@ setup_bootloader()
     if [ ${LUKS} = ${TRUE} ]
     then
         cat >> "${CHROOT}/boot/loader/entries/arch.conf" << EOF
-        title       Arch Linux
-        linux       /vmlinuz-linux
-        initrd      /initramfs-linux.img
-        options     cryptdevice=UUID=${uuid}:${CRYPT_ROOT} root=/dev/mapper/${CRYPT_ROOT} rw
-        EOF
+title       Arch Linux
+linux       /vmlinuz-linux
+initrd      /initramfs-linux.img
+ophttps://www.startpage.com/tions     cryptdevice=UUID=${uuid}:${CRYPT_ROOT} root=/dev/mapper/${CRYPT_ROOT} rw
+EOF
     else
         cat >> "${CHROOT}/boot/loader/entries/arch.conf" << EOF
-        title       Arch Linux
-        linux       /vmlinuz-linux
-        initrd      /initramfs-linux.img
-        options     root=UUID=${uuid} rw
-        EOF
+title       Arch Linux
+linux       /vmlinuz-linux
+options     root=UUID=${uuid} rw
+initrd      /initramfs-linux.img
+EOF
     fi
   else
       wprintf "[+] Setting up GRUB boot loader"
@@ -1010,7 +1007,9 @@ setup_display_manager()
     wprintf "[+] Setting up gdm display manager"
     printf "\n"
 
-    printf " > gdm \n"
+    printf "
+    > gdm
+    \n"
 
     sleep 2
 
