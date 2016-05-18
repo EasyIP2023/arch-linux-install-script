@@ -1,12 +1,8 @@
-Stuff to do after install
-
-ip link
-
-#Do this for both ether and wireless
-systemctl stop dhcpcd@NAME-OF-THE-NETWORK.service
-systemctl disable dhcpcd@NAME-OF-THE-NETWORK.service
-
-systemctl enable networkmanager.service
-systemctl start networkmanager.service
-systemctl enable gdm.service
-systemctl start gdm.service
+#TODO
+Install GitKraken
+Install Steam
+Install Atom
+Install Truecrypt
+Install Keepassx
+Add Fake Mac on Reboot
+Install Yubikey

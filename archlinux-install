@@ -865,10 +865,10 @@ setup_extra_packages(){
 
     browser="firefox midori elinks"
 
-    editor="vim eclipse-java"
+    editor="vim eclipse-java libreOffice"
 
     filesystem="btrfs-progs cryptsetup device-mapper dmraid dosfstools
-    gptfdisk nilfs-utils ntfs-3g partclone parted partimage"
+    gptfdisk nilfs-utils ntfs-3g partclone parted partimage gparted"
 
     fonts="ttf-liberation ttf-dejavu ttf-freefont xorg-font-utils
     xorg-fonts-alias xorg-fonts-misc xorg-mkfontscale xorg-mkfontdir
@@ -880,13 +880,14 @@ setup_extra_packages(){
     ctags expac feh git gpm grml-zsh-config haveged hdparm htop
     inotify-tools ipython irssi linux-atm lsof mercurial mesa mlocate moreutils
     mpv mtools mupdf p7zip rsync rtorrent scrot smartmontools speedtouch strace
-    sudo tzdata unace unrar unzip usb_modeswitch zip zsh"
+    sudo tzdata unace unrar unzip usb_modeswitch zip zsh gdebi filezilla filezilla-common"
 
     network="bridge-utils darkhttpd atftp bind-tools dnsmasq
     dhclient dnsutils gnu-netcat ipw2100-fw ipw2200-fw lftp nfs-utils ntp
     openconnect openssh openvpn ppp pptpclient rfkill rp-pppoe vpnc
-    wireless_tools wpa_actiond wvdial xl2tpd zd1211-firmware networkmanager networkmanager-openconnect
-    networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog gnome-keyring"
+    wireless_tools wpa_actiond wvdial xl2tpd zd1211-firmware networkmanager
+    networkmanager-openconnect networkmanager-openvpn networkmanager-pptp
+    networkmanager-vpnc wpa_supplicant wireless_tools dialog gnome-keyring tor"
 
     java = "jre7-openjdk-headless jre7-openjdk jdk7-openjdk openjdk7-doc openjdk7-src jre8-openjdk-headless jre8-openjdk
     jdk8-openjdk openjdk8-doc openjdk8-src java-openjfx java-openjfx-doc java-openjfx-src"
@@ -900,6 +901,7 @@ setup_extra_packages(){
     xf86-video-sis xf86-video-sisusb xf86-video-tdfx xf86-video-trident
     xf86-video-tseng xf86-video-vesa xf86-video-vmware xf86-video-voodoo
     xorg-server xorg-xinit xorg-server-utils xterm"
+
 
     all="${arch} ${bluetooth} ${browser} ${editor} ${filesystem} ${fonts}"
     all="${all} ${kernel} ${misc} ${network} ${java} ${xorg}"
