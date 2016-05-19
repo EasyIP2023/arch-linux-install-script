@@ -1,15 +1,11 @@
 #!/bin/bash
 
-# true / false
 TRUE=0
 FALSE=1
 
 # return codes
 SUCCESS=1337
 FAILURE=31337
-
-# verbose mode - default: quiet
-VERBOSE="/dev/null"
 
 #Colors
 WHITE="`tput setaf 7`"
@@ -23,58 +19,21 @@ YELLOWB="`tput bold ; tput setaf 3`"
 BLINK="`tput blink`"
 NC="`tput sgr0`"
 
-# chosen keymap
-KEYMAP=""
-
-# set keymap
-SET_KEYMAP="1"
-
-# list keymaps
-LIST_KEYMAP="2"
-
-# hostname
 HOST_NAME=""
-
-# LUKS flag
-LUKS=""
-
-# avalable hard drive
-HD_DEVS=""
-
-# chosen hard drive device
-HD_DEV=""
-
-# partition label: gpt or msdos
-PART_LABEL=""
-
-# boot partition
+HD_BOOT=""
+HD_ROOt=""
+HD_SWAP=""
+HD_SDA="/dev/sda"
+RUBY_VERSION=""
 BOOT_PART=""
-
-# root partition
 ROOT_PART=""
-
-# crypted root
+#TODO
+luks=""
 CRYPT_ROOT="r00t"
 
-# swap partition
-SWAP_PART=""
-
-# boot fs type - default: ext4
-BOOT_FS_TYPE=""
-
-# root fs type - default: ext4
-ROOT_FS_TYPE=""
-
-# chroot directory
 CHROOT="/mnt"
-
-# VirtualBox setup - default: false
-VBOX_SETUP=$FALSE
-
-# normal system user
 NORMAL_USER=""
 
-# print formatted output
 wprintf(){
   fmt="${1}"
   shift
@@ -83,24 +42,21 @@ wprintf(){
 }
 
 
-# print warning
 warn(){
   printf "%s[!] WARNING: %s%s\n" "${YELLOW}" "${@}" "${NC}"
   return $SUCCESS
 }
 
-# print error and exit
 err(){
   printf "%s[-] ERROR: %s%s\n" "${RED}" "${@}" "${NC}"
   exit $FAILURE
   return $SUCCESS
 }
 
-# leet banner (very important)
 banner()
 {
   columns="$(tput cols)"
-  str="*********************** Arch Linux Installer Script  ***************************"
+  str="*********************** Arch Linux Installer Script (Script Is designed fot how I install)  ***************************"
 
   printf "${REDB}%*s${NC}\n" "${COLUMNS:-$(tput cols)}" | tr ' ' '-'
 
@@ -114,7 +70,6 @@ banner()
   return "$SUCCESS"
 }
 
-# sleep and clear
 sleep_clear(){
     sleep $1
     clear
@@ -122,33 +77,6 @@ sleep_clear(){
     return $SUCCESS
 }
 
-# confirm user inputted yYnN
-confirm(){
-  header="${1}"
-  ask="${2}"
-
-  while true
-  do
-    title "${header}"
-    wprintf "${ask}"
-    read input
-    if [ "${input}" = "y" -o "${input}" = "Y" ]
-    then
-      return $TRUE
-    elif [ "${input}" = "n" -o "${input}" = "N" ]
-    then
-      return $FALSE
-    else
-      clear
-      continue
-    fi
-  done
-
-  return $SUCCESS
-}
-
-
-# print menu title
 title()
 {
   banner
@@ -157,8 +85,6 @@ title()
   return "${SUCCESS}"
 }
 
-
-# check for environment issues
 check_env()
 {
   if [ -f "/var/lib/pacman/db.lck" ]
@@ -167,8 +93,6 @@ check_env()
   fi
 }
 
-
-# check user id
 check_uid()
 {
   if [ `id -u` -ne 0 ]
@@ -178,60 +102,8 @@ check_uid()
 
   return $SUCCESS
 }
-# ask for keymap to use
-ask_keymap(){
-  while [ \
-    "${keymap_opt}" != "${SET_KEYMAP}" -a \
-    "${keymap_opt}" != "${LIST_KEYMAP}" ]
-  do
-    title "Keymap Setup"
-    wprintf "[+] Available keymap options:"
-    printf "\n
-    1. Set a keymap
-    2. List available keymaps\n\n"
-    wprintf "[?] Make a choice: "
-    read keymap_opt
 
-    if [ "${keymap_opt}" = "${SET_KEYMAP}" ]
-    then
-      break
-    fi
-    if [ "${keymap_opt}" = "${LIST_KEYMAP}" ]
-    then
-      localectl list-keymaps
-      echo
-    fi
-    clear
-  done
-
-  clear
-
-  return $SUCCESS
-}
-
-
-# set keymap to use
-set_keymap(){
-  title "Keymap Setup"
-  wprintf "[?] Set keymap [us]: "
-  read KEYMAP
-
-  # default keymap
-  if [ -z "${KEYMAP}" ]
-  then
-    KEYMAP="us"
-  fi
-
-  localectl set-keymap --no-convert "${KEYMAP}"
-  loadkeys "${KEYMAP}"
-
-  return $SUCCESS
-}
-
-
-# enable multilib in pacman.conf if x86_64 present
-enable_pacman_multilib()
-{
+enable_pacman_multilib_add_archlinuxfr(){
   title "Update pacman.conf"
 
   if [ "`uname -m`" = "x86_64" ]
@@ -240,21 +112,20 @@ enable_pacman_multilib()
     printf "\n\n"
     if grep -q "#\[multilib\]" /etc/pacman.conf
     then
-      # it exists but commented
       sed -i '/\[multilib\]/{ s/^#//; n; s/^#//; }' /etc/pacman.conf
     elif ! grep -q "\[multilib\]" /etc/pacman.conf
     then
-      # it does not exist at all
       printf "[multilib]\nInclude = /etc/pacman.d/mirrorlist\n" \
         >> /etc/pacman.conf
     fi
   fi
+  echo " [archlinuxfr]
+  SigLevel = Never
+  Server = http://repo.archlinux.fr/$arch" >> /etc/pacman.conf
 
   return $SUCCESS
 }
 
-
-# enable color mode in pacman.conf
 enable_pacman_color(){
   title "Update pacman.conf"
 
@@ -266,7 +137,6 @@ enable_pacman_color(){
   return $SUCCESS
 }
 
-# update pacman package database
 update_pkg_database()
 {
   title "Update pacman database"
@@ -279,10 +149,9 @@ update_pkg_database()
   return $SUCCESS
 }
 
-# update pacman.conf and database
 update_pacman(){
   title "Update Pacman"
-  enable_pacman_multilib
+  enable_pacman_multilib_add_archlinuxfr
   sleep_clear 1
 
   enable_pacman_color
@@ -294,7 +163,6 @@ update_pacman(){
   return $SUCCESS
 }
 
-# ask user for hostname
 ask_hostname(){
   while [ -z "${HOST_NAME}" ]
   do
@@ -307,26 +175,6 @@ ask_hostname(){
   return $SUCCESS
 }
 
-# ask user for luks encrypted partition
-ask_luks()
-{
-  while [ "${LUKS}" = "" ]
-  do
-    if confirm "Hard Drive Setup" "[?] Full encrypted root [y/n]: "
-    then
-      LUKS=$TRUE
-      echo
-      warn "The root partition will be encrypted"
-    else
-      LUKS=$FALSE
-      echo
-      warn "The root partition will NOT be encrypted"
-    fi
-    sleep_clear 2
-  done
-  return $SUCCESS
-}
-
 
 # get available hard disks
 get_hd_devs(){
@@ -334,69 +182,14 @@ get_hd_devs(){
   return $SUCCESS
 }
 
-# ask user for device to format and setup
-ask_hd_dev(){
-  while true
-  do
-    title "Hard Drive Setup"
-
-    wprintf "[+] Available hard drives for installation:"
-    printf "\n\n"
-
-    for i in ${HD_DEVS}
-    do
-      echo "    > ${i}"
-    done
-    echo
-    wprintf "[?] Please choose a device: "
-    read HD_DEV
-    if echo ${HD_DEVS} | grep "\<${HD_DEV}\>" > /dev/null
-    then
-      HD_DEV="/dev/${HD_DEV}"
-      clear
-      break
-    fi
-    clear
-  done
-
-  return $SUCCESS
-}
-
-# ask user to create partitions using cfdisk
-ask_cfdisk()
-{
-    if confirm "Hard Drive Setup" "[?] Create partitions with cfdisk (root and \ boot, optional swap) [y/n]: "
-    then
-        cfdisk -z "${HD_DEV}"
-        sync
-    else
-        echo
-        err "Are you shiting me? No partitions you FUCK!"
-    fi
-
-    return $SUCCESS
-}
-
-
-# get partition label
-get_partition_label()
-{
-    PART_LABEL="`parted -m ${HD_DEV} print | grep ${HD_DEV} | cut -d ':' -f 6`"
-
-    return $SUCCESS
-}
-
-
 # get partitions
 get_partitions()
 {
-    partitions=`ls ${HD_DEV}* | grep -v "${HD_DEV}\>"`
+    partitions=`ls ${HD_SDA}* | grep -v "${HD_SDA}\>"`
 
     while [ \
-        "${BOOT_PART}" = "" -o \
-        "${ROOT_PART}" = "" -o \
-        "${BOOT_FS_TYPE}" = "" -o \
-        "${ROOT_FS_TYPE}" = "" ]
+        "${HD_BOOT}" = "" -o \
+        "${HD_ROOT}" = "" -o ]
     do
         title "Hard Drive Setup"
         wprintf "[+] Created partitions:"
@@ -409,23 +202,13 @@ get_partitions()
         echo
 
         wprintf "[?] Boot partition (/dev/sdXY): "
-        read BOOT_PART
-        wprintf "[?] Boot FS type (ext2, ext3, ext4, fat32): "
-        read BOOT_FS_TYPE
+        read HD_BOOT
         wprintf "[?] Root partition (/dev/sdXY): "
-        read ROOT_PART
-        wprintf "[?] Root FS type (ext2, ext3, ext4): "
-        read ROOT_FS_TYPE
-        wprintf "[?] Swap parition (/dev/sdXY - empty for none): "
-        read SWAP_PART
-
-        if [ "${SWAP_PART}" = "" ]
-        then
-            SWAP_PART="none"
-        fi
+        read HD_ROOT
+        wprintf "[?] Swap parition (/dev/sdXY): "
+        read HD_SWAP
         clear
     done
-
     return $SUCCESS
 }
 
@@ -440,9 +223,9 @@ print_partitions()
         title "Hard Drive Setup"
         wprintf "[+] Current Partition table"
         printf "\n
-    > /boot     : ${BOOT_PART} (${BOOT_FS_TYPE})
-    > /         : ${ROOT_PART} (${ROOT_FS_TYPE})
-    > swap      : ${SWAP_PART} (swap)
+    > /boot     : ${HD_BOOT}
+    > /         : ${HD_ROOT}
+    > swap      : ${HD_SWAP}
     \n"
         wprintf "[?] Are the partition table correct [y/n]: "
         read i
@@ -464,726 +247,197 @@ print_partitions()
     return $SUCCESS
 }
 
-
-# ask user and get confirmation for formatting
-ask_formatting()
-{
-    if confirm "Hard Drive Setup" "[?] Formatting partitions. Are you sure? \ [y/n]: "
-    then
-      return $SUCCESS
-    else
-      echo
-      err "NOT FORMATTED YOU FUCK"
-    fi
-
-    return $SUCCESS
-}
-
-
-# create LUKS encrypted partition
-make_luks_partition()
-{
-    part="${1}"
-
-    title "Hard Drive Setup"
-
-    wprintf "[+] Creating LUKS partition"
-    printf "\n"
-    cryptsetup -y -v -s 512 luksFormat "${part}"
-
-    return $SUCCESS
-}
-
-
-# open LUKS partition
-open_luks_partition()
-{
-    part="${1}"
-    name="${2}"
-
-    title "Hard Drive Setup"
-
-    wprintf "[+] Opening LUKS partition"
-    printf "\n\n"
-    cryptsetup open "${part}" "${name}"
-
-    return $SUCCESS
-}
-
-
-# create swap partition
-make_swap_partition()
-{
-    title "Hard Drive Setup"
-
-    wprintf "[+] Creating SWAP partition"
-    printf "\n\n"
-    mkswap "${SWAP_PART}"
-
-    return $SUCCESS
-}
-
-
-# make and format root partition
-make_root_partition()
-{
-    if [ ${LUKS} = ${TRUE} ]
-    then
-        make_luks_partition "${ROOT_PART}"
-        sleep_clear 1
-        open_luks_partition "${ROOT_PART}" "${CRYPT_ROOT}"
-        sleep_clear 1
-        title "Hard Drive Setup"
-        wprintf "[+] Creating encrypted ROOT partition"
-        printf "\n\n"
-        mkfs.${ROOT_FS_TYPE} "/dev/mapper/${CRYPT_ROOT}"
-        sleep_clear 1
-    else
-        title "Hard Drive Setup"
-        wprintf "[+] Creating ROOT partition"
-        printf "\n\n"
-        mkfs.${ROOT_FS_TYPE} -F ${ROOT_PART}
-        sleep_clear 1
-    fi
-
-    return $SUCCESS
-}
-
-
-# make and format boot partition
-make_boot_partition()
-{
-  title "Hard Drive Setup"
-
-  wprintf "[+] Creating BOOT partition"
-  printf "\n\n"
-  if [ "${PART_LABEL}" = "gpt" ]
-  then
-      mkfs.fat -F32 ${BOOT_PART}
-  else
-      mkfs.${BOOT_FS_TYPE} -F ${BOOT_PART}
-  fi
+install_base_system(){
+  title "Installing Base System"
+  printf "Choose a Server"
+  sleep 15
+  vim /etc/pacman.d/mirrorlist
+  pacstrap -i "${CHROOT}" base base-devel
 
   return $SUCCESS
 }
 
+before_chroot(){
+  printf "Be Sure to create 3 paritions\nSDA1 = BIOS (Mem=1007KiB fs=ef02)\nSDA2 = ROOT (Mem=<amount>GiB, fs=8300)\nSDA3= Swap (Mem=<amount>MiB, fs=8200)\n"
+  sleep 40
+  get_hd_devs
+  cgdisk "${HD_SDA}"
 
-# make and format partitions
-make_partitions()
-{
-  make_boot_partition
+  get_partitions
   sleep_clear 1
 
-  make_root_partition
+  print_partitions
   sleep_clear 1
 
-  if [ "${SWAP_PART}" != "none" ]
-  then
-    make_swap_partition
-    sleep_clear 1
-  fi
+  mkfs.ext4 "${HD_ROOT}"
+  mkswap "${HD_SWAP}"
+  swapon "${HD_SWAP}"
+  mount "${HD_ROOT}" "${CHROOT}"
+
+  install_base_system
+  sleep_clear 1
+
+  genfstab -U -p "${CHROOT}" >> "${CHROOT}/etc/fstab"
 
   return $SUCCESS
 }
 
+install_yubikey(){
+  title "Installing Yubikey For Authentication"
+  #Install yubiPam for authentication and yubikey personalization tool
+  chroot "${CHROOT}" cd /usr/local/src
+  chroot "${CHROOT}" git clone https://github.com/firnsy/yubipam.git
+  chroot "${CHROOT}" cd yubipam
+  chroot "${CHROOT}" autoreconf -i
+  chroot "${CHROOT}" ./configure
+  chroot "${CHROOT}" make install
+  chroot "${CHROOT}" groupadd yubiauth
+  chroot "${CHROOT}" touch /etc/yubikey
+  chroot "${CHROOT}" chgrp yubiauth /etc/yubikey /usr/local/sbin/yk_chkpwd
+  chroot "${CHROOT}" chmod g+rw /etc/yubikey
+  chroot "${CHROOT}" chmod g+s /usr/local/sbin/yk_chkpwd
+  chroot "${CHROOT}" pacman -S yubikey-personalization-gui --noconfirm
 
-# mount filesystems
-mount_filesystems()
-{
-  title "Hard Drive Setup"
-
-  wprintf "[+] Mounting filesystems"
-  printf "\n\n"
-
-  # ROOT
-  if [ ${LUKS} = ${TRUE} ]
-  then
-      mount "/dev/mapper/${CRYPT_ROOT}" ${CHROOT} > /dev/null 2>&1
-  else
-      mount ${ROOT_PART} ${CHROOT} > /dev/null 2>&1
-  fi
-
-  # BOOT
-  mkdir /mnt/boot > /dev/null 2>&1
-  mount ${BOOT_PART} "${CHROOT}/boot" > /dev/null 2>&1
-
-  # SWAP
-  swapon "${SWAP_PART}" > /dev/null 2>&1
+  return $SUCCESS
+}
+#TODO
+#Change it so it installs via reg user
+install_ruby_on_rails(){
+  title "Install Ruby On rails"
+  chroot "${CHROOT}" pacman -S curl --noconfirm
+  chroot "${CHROOT}" pacman -S libyaml --noconfirm
+  chroot "${CHROOT}" gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+  chroot "${CHROOT}" curl -sSL https://get.rvm.io | bash -s stable
+  chroot "${CHROOT}" source ~/.rvm/scripts/rvm
+  chroot "${CHROOT}" rvm pkg install openssl
+  chroot "${CHROOT}" printf "Enter Ruby Version"
+  chroot "${CHROOT}" read RUBY_VERSION
+  chroot "${CHROOT}" rvm install "${RUBY_VERSION}" --with-openssl-dir=~/.rvm/usr
+  chroot "${CHROOT}" gem install rails
+  chroot "${CHROOT}" gem install bundler
 
   return $SUCCESS
 }
 
+install_apache_pushion_passenger(){
+  chroot "${CHROOT}" pacman -S apache
+  chroot "${CHROOT}" pacman -S mysql
+  chroot "${CHROOT}" gem install passenger
+  chroot "${CHROOT}" passenger-install-apache2-module
+  chroot "${CHROOT}" echo "LoadModule passenger_module /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/gems/passenger-5.0.28/buildout/apache2/mod_passenger.so
+                          <IfModule mod_passenger.c>
+                            PassengerRoot /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/gems/passenger-5.0.28
+                            PassengerDefaultRuby /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/wrappers/ruby
+                          </IfModule>
 
-# unmount filesystems
-umount_filesystems()
-{
-  routine="${1}"
+                          RackEnv development
+                          <VirtualHost *:80>
+                            ServerName www.${NORMAL_USER}-davis.com
+                            DocumentRoot /home/${NORMAL_USER}/git/gbp_website/public
+                            <Directory /home/${NORMAL_USER}/git/gbp_website/public>
+                              AllowOverride all
+                              Options -MultiViews
+                              Require all granted
+                            </Directory>
+                          </VirtualHost>" >> /etc/httpd/conf/httpd.conf
+  chroot "${CHROOT}" vim /etc/httpd/conf/httpd.conf
+}
 
-  if [ "${routine}" = "harddrive" ]
-  then
-      title "Hard Drive Setup"
-  else
-      title "Game Over"
-  fi
+install_pakages(){
+  title "Instaling Regularly use Packages"
+  #install some base stuff like graphics (Intel integrated graphics)
+  chroot "${CHROOT}" pacman -S xf86-input-synaptics --noconfirm
+  chroot "${CHROOT}" pacman -S xorg-server xorg-server-utils xorg-xinit xorg-twm xorg-xclock xterm --noconfirm
+  chroot "${CHROOT}" pacman -S mesa --noconfirm
+  chroot "${CHROOT}" pacman -S lib32-mesa-libgl --noconfirm
+  chroot "${CHROOT}" pacman -S firefox --noconfirm
+  chroot "${CHROOT}" pacman -S libreoffice --noconfirm
+  chroot "${CHROOT}" pacman -S bleachbit --noconfirm
+  chroot "${CHROOT}" pacman -S yaourt --noconfirm
+  #install Java
+  chroot "${CHROOT}" pacman -S jre7-openjdk-headless jre7-openjdk jdk7-openjdk openjdk7-doc openjdk7-src jre8-openjdk-headless jre8-openjdk jdk8-openjdk openjdk8-doc openjdk8-src java-openjfx java-openjfx-doc java-openjfx-src --noconfirm
 
-  wprintf "[+] Unmounting filesystems"
-  printf "\n\n"
+  #install networkmanager
+  chroot "${CHROOT}" pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog gnome-keyring --noconfirm
 
-  umount -Rf ${CHROOT} > /dev/null 2>&1
-  umount -Rf "${BOOT_PART}" > /dev/null 2>&1
-  umount -Rf "${CHROOT}/proc" > /dev/null 2>&1
-  umount -Rf "${CHROOT}/sys" > /dev/null 2>&1
-  umount -Rf "${CHROOT}/dev" > /dev/null 2>&1
-  umount -Rf "${BOOT_PART}" > /dev/null 2>&1
-  umount -Rf "${ROOT_PART}" > /dev/null 2>&1
-  umount -Rf "/dev/mapper/${CRYPT_ROOT}" > /dev/null 2>&1
-  cryptsetup luksClose "${CRYPT_ROOT}" > /dev/null 2>&1
-  swapoff "${SWAP_PART}" > /dev/null 2>&1
+  #Install gnome desktop environment
+  chroot "${CHROOT}" pacman -S gnome gnome-extra --noconfirm
+  chroot "${CHROOT}" pacman -S gnome-tweak-tool --noconfirm
+
+  #Ruby Installed on root user
+  install_ruby_on_rails
+  sleep_clear 1
+
+  install_apache_pushion_passenger
+  sleep_clear 1
+
+  install_yubikey
+  sleep_clear 1
+}
+
+
+after_chroot(){
+  #Uncomment the language
+  chroot "${CHROOT}" pacman -S vim --noconfirm
+  chroot "${CHROOT}" vim /etc/locale.gen
+  chroot "${CHROOT}" locale-gen
+  chroot "${CHROOT}" echo LANG=en_US.UTF-8 > /etc/locale.conf
+  chroot "${CHROOT}" export LANG=en_US.UTF-8
+
+  #Change Time
+  chroot "${CHROOT}" ln -s /usr/share/zoneinfo/US/Central > /etc/localtime
+  chroot "${CHROOT}" hwclock --systohc --utc
+
+  #add host name
+  ask_hostname
+  chroot "${CHROOT}" echo "${HOST_NAME}" > /etc/hostname
+
+  #uncomment Include=/etc/pacman.d/mirrorlist
+  update_pacman
+  sleep_clear 1
+
+  #TODO
+  #Installing Blackarch linux
+  #wget -O /tmp/strap.sh http://blackarch.org/strap.sh
+  #cd /tmp
+  #chmod 777 strap.sh
+  #./strap.sh
+  #pacman -S blackarch --force
+
+  title "User Creation"
+  chroot "${CHROOT}" passwd
+  chroot "${CHROOT}" printf "Enter Normal User username"
+  chroot "${CHROOT}" read NORMAL_USER
+  chroot "${CHROOT}" useradd -m -g users -G wheel,storage,power -s /bin/bash "${NORMAL_USER}"
+  chroot "${CHROOT}" passwd "${NORMAL_USER}"
+
+  #Uncomment %wheel ALL=(ALL) ALL
+  chroot "${CHROOT}" EDITOR=vim visudo
+  chroot "${CHROOT}" pacman -S bash-completion
+
+  #Install grub
+  title "Grub Creation"
+  chroot "${CHROOT}" pacman -S grub os-prober --noconfirm
+  chroot "${CHROOT}" grub-install --target=i386-pc --recheck "${HD_SDA}"
+  chroot "${CHROOT}" grub-mkconfig -o /boot/grub/grub.cfg
+
+  sleep_clear 1
+  install_pakages
+
+  chroot "${CHROOT}" systemctl enable gdm.service
+  chroot "${CHOORT}" systemctl enable NetworkManager.service
 
   return $SUCCESS
 }
 
+main(){
+  before_chroot
+  sleep_clear 1
 
-# install ArchLinux base and base-devel packages
-install_base_packages(){
-  title "Base System Package Install Setup"
+  after_chroot
+  sleep_clear 1
 
-  wprintf "[+] Installing ArchLinux base packages"
-  printf "\n\n"
-
-  pacstrap ${CHROOT} base base-devel
-  chroot ${CHROOT} pacman -Syy --force
+  printf "Installation Complete"
 
   return $SUCCESS
 }
-
-# setup /etc/resolv.conf
-setup_resolvconf(){
-  title "Base System Setup"
-
-  wprintf "[+] Setting up /etc/resolv.conf"
-  printf "\n\n"
-
-  cp "/etc/resolv.conf" "${CHROOT}/etc/resolv.conf"
-
-  return $SUCCESS
-}
-
-# setup fstab
-setup_fstab(){
-  title "Base System fstab Setup"
-
-  wprintf "[+] Setting up /etc/fstab"
-  printf "\n\n"
-
-  if [ "${PART_LABEL}" = "gpt" ]
-  then
-      genfstab -U ${CHROOT} >> "${CHROOT}/etc/fstab"
-  else
-      genfstab -L ${CHROOT} >> "${CHROOT}/etc/fstab"
-  fi
-
-  return $SUCCESS
-}
-
-# setup locale and keymap
-setup_locale(){
-  title "Base System TimeZone and Keymap Setup"
-
-  wprintf "[+] Setting up default locale (en_US.UTF-8)"
-  printf "\n\n"
-
-  sed -i 's/^#en_US.UTF-8/en_US.UTF-8/' "${CHROOT}/etc/locale.gen"
-  chroot ${CHROOT} locale-gen
-  echo "KEYMAP=${KEYMAP}" > "${CHROOT}/etc/vconsole.conf"
-
-  return $SUCCESS
-}
-# setup time and timezone
-setup_time()
-{
-  title "Base System Setup"
-
-  wprintf "[+] Setting up default time and timezone: America/Central"
-  printf "\n\n"
-  chroot ${CHROOT} tzselect
-  return $SUCCESS
-}
-
-# setup initramfs
-setup_initramfs()
-{
-  title "Base System Setup"
-
-  wprintf "[+] Setting up initramfs"
-  printf "\n\n"
-
-  if [ ${LUKS} = ${TRUE} ]
-  then
-      sed -i 's/block filesystems/block keymap encrypt filesystems/g' \
-          "${CHROOT}/etc/mkinitcpio.conf"
-  fi
-
-  chroot ${CHROOT} mkinitcpio -p linux
-
-  return $SUCCESS
-}
-
-
-# mount /proc, /sys and /dev
-setup_proc_sys_dev()
-{
-    title "Base System Setup"
-
-    wprintf "[+] Setting up /proc, /sys and /dev"
-    printf "\n\n"
-
-    mkdir -p "${CHROOT}/"{proc,sys,dev} > /dev/null 2>&1
-
-    mount -t proc proc "${CHROOT}/proc"
-    mount --rbind /sys "${CHROOT}/sys"
-    mount --make-rslave "${CHROOT}/sys"
-    mount --rbind /dev "${CHROOT}/dev"
-    mount --make-rslave "${CHROOT}/dev"
-
-    return $SUCCESS
-}
-
-# setup boot loader for UEFI/GPT or BIOS/MBR
-setup_bootloader()
-{
-  uuid="`blkid ${ROOT_PART} | cut -d ' ' -f 2 | cut -d '"' -f 2`"
-
-  title "Base System BootLoader Setup"
-
-  if [ "${PART_LABEL}" = "gpt" ]
-  then
-    wprintf "[+] Setting up EFI boot loader"
-    printf "\n\n"
-
-    chroot ${CHROOT} bootctl install
-
-    if [ ${LUKS} = ${TRUE} ]
-    then
-        cat >> "${CHROOT}/boot/loader/entries/arch.conf" << EOF
-title       Arch Linux
-linux       /vmlinuz-linux
-initrd      /initramfs-linux.img
-ophttps://www.startpage.com/tions     cryptdevice=UUID=${uuid}:${CRYPT_ROOT} root=/dev/mapper/${CRYPT_ROOT} rw
-EOF
-    else
-        cat >> "${CHROOT}/boot/loader/entries/arch.conf" << EOF
-title       Arch Linux
-linux       /vmlinuz-linux
-options     root=UUID=${uuid} rw
-initrd      /initramfs-linux.img
-EOF
-    fi
-  else
-      wprintf "[+] Setting up GRUB boot loader"
-      printf "\n\n"
-
-      chroot ${CHROOT} pacman -S grub --noconfirm --force --needed
-
-      if [ -f "data/splash.png" ]
-      then
-          cp data/splash.png "${CHROOT}/boot/grub/splash.png"
-      else
-          cp /usr/share/Arch_Linu-install-script/data/splash.png \
-              "${CHROOT}/boot/grub/splash.png"
-      fi
-      if [ ${LUKS} = ${TRUE} ]
-      then
-          sed -i "s|quiet|cryptdevice=${ROOT_PART}:${CRYPT_ROOT} root=/dev/mapper/${CRYPT_ROOT}|" "${CHROOT}/etc/default/grub"
-      fi
-      sed -i 's/quiet//g' "${CHROOT}/etc/default/grub"
-      sed -i 's/Arch//g' "${CHROOT}/etc/default/grub"
-      echo "GRUB_BACKGROUND=\"/boot/grub/splash.png\"" >> \
-          "${CHROOT}/etc/default/grub"
-      chroot ${CHROOT} grub-install --target=i386-pc "${HD_DEV}"
-      chroot ${CHROOT} grub-mkconfig -o /boot/grub/grub.cfg
-      sed -i 's/Arch Linux/g' "${CHROOT}/boot/grub/grub.cfg"
-      chroot ${CHROOT} grub-mkconfig -o /boot/grub/grub.cfg
-    fi
-
-    return $SUCCESS
-}
-# ask for normal user account to setup
-ask_user_account()
-{
-  if confirm "Base System Setup" "[?] Setup a normal user account [y/n]: "
-  then
-    wprintf "[?] User name: "
-    read NORMAL_USER
-  fi
-
-  return $SUCCESS
-}
-
-
-# setup user account, password and environment
-setup_user()
-{
-  user="${1}"
-
-  title "Base System User Setup"
-
-  wprintf "[+] Setting up ${user} account"
-  printf "\n\n"
-
-  # normal user
-  if [ ! -z ${NORMAL_USER} ]
-  then
-    chroot ${CHROOT} groupadd ${user}
-    chroot ${CHROOT} useradd -g ${user} -d "/home/${user}" -s "/bin/bash" \
-      -G "wheel,users" -m ${user}
-    chroot ${CHROOT} usermod -G "${user},video,audio" ${user}
-    chroot ${CHROOT} chown -R ${user}:${user} "/home/${user}"
-    wprintf "[+] Added user: ${user}"
-    printf "\n\n"
-  fi
-
-  # environment
-  if [ -z ${NORMAL_USER} ]
-  then
-    if [ -d "data/root" ]
-    then
-      cp -r data/root/. "${CHROOT}/root/."
-    else
-      cp -r /usr/share/Arch_Linux-install-script/data/root/. \
-          "${CHROOT}/root/."
-    fi
-  else
-    cp -r data/user/. "${CHROOT}/home/${user}/."
-  fi
-
-  # password
-  wprintf "[?] Set password for ${user}: "
-  printf "\n\n"
-  if [ "${user}" = "root" ]
-  then
-    chroot ${CHROOT} passwd
-  else
-    chroot ${CHROOT} passwd "${user}"
-  fi
-
-  return $SUCCESS
-}
-
-setup_extra_packages(){
-    arch="abs arch-install-scripts archlinux-keyring pkgfile"
-
-    bluetooth="bluez bluez-firmware bluez-hid2hci bluez-utils"
-
-    browser="firefox midori elinks"
-
-    editor="vim eclipse-java libreOffice"
-
-    filesystem="btrfs-progs cryptsetup device-mapper dmraid dosfstools
-    gptfdisk nilfs-utils ntfs-3g partclone parted partimage gparted"
-
-    fonts="ttf-liberation ttf-dejavu ttf-freefont xorg-font-utils
-    xorg-fonts-alias xorg-fonts-misc xorg-mkfontscale xorg-mkfontdir
-    ttf-indic-otf"
-
-    kernel="linux-api-headers linux-headers"
-
-    misc="acpi alsa-utils bleachbit b43-fwcutter bash-completion bc btrfs-progs cmake
-    ctags expac feh git gpm grml-zsh-config haveged hdparm htop
-    inotify-tools ipython irssi linux-atm lsof mercurial mesa mlocate moreutils
-    mpv mtools mupdf p7zip rsync rtorrent scrot smartmontools speedtouch strace
-    sudo tzdata unace unrar unzip usb_modeswitch zip zsh gdebi filezilla filezilla-common"
-
-    network="bridge-utils darkhttpd atftp bind-tools dnsmasq
-    dhclient dnsutils gnu-netcat ipw2100-fw ipw2200-fw lftp nfs-utils ntp
-    openconnect openssh openvpn ppp pptpclient rfkill rp-pppoe vpnc
-    wireless_tools wpa_actiond wvdial xl2tpd zd1211-firmware networkmanager
-    networkmanager-openconnect networkmanager-openvpn networkmanager-pptp
-    networkmanager-vpnc wpa_supplicant wireless_tools dialog gnome-keyring tor"
-
-    java = "jre7-openjdk-headless jre7-openjdk jdk7-openjdk openjdk7-doc openjdk7-src jre8-openjdk-headless jre8-openjdk
-    jdk8-openjdk openjdk8-doc openjdk8-src java-openjfx java-openjfx-doc java-openjfx-src"
-
-    xorg="xf86-video-ark xf86-video-ati xf86-video-chips
-    xf86-video-dummy xf86-video-fbdev xf86-video-glint
-    xf86-video-i128 xf86-video-i740 xf86-video-intel xf86-video-mach64
-    xf86-video-neomagic xf86-video-nouveau
-    xf86-video-nv xf86-video-openchrome xf86-video-r128 xf86-video-rendition
-    xf86-video-s3 xf86-video-s3virge xf86-video-savage xf86-video-siliconmotion
-    xf86-video-sis xf86-video-sisusb xf86-video-tdfx xf86-video-trident
-    xf86-video-tseng xf86-video-vesa xf86-video-vmware xf86-video-voodoo
-    xorg-server xorg-xinit xorg-server-utils xterm"
-
-
-    all="${arch} ${bluetooth} ${browser} ${editor} ${filesystem} ${fonts}"
-    all="${all} ${kernel} ${misc} ${network} ${java} ${xorg}"
-
-    title "Base System Setup"
-
-    wprintf "[+] Installing extra packages"
-    printf "\n"
-
-    printf "
-    > ArchLinux     : `echo ${arch} | wc -w` packages
-    > Browser       : `echo ${browser} | wc -w` packages
-    > Bluetooth     : `echo ${bluetooth} | wc -w` packages
-    > Editor        : `echo ${editor} | wc -w` packages
-    > Filesystem    : `echo ${filesystem} | wc -w` packages
-    > Fonts         : `echo ${fonts} | wc -w` packages
-    > Misc          : `echo ${misc} | wc -w` packages
-    > Network       : `echo ${network} | wc -w` packages
-    > Java          : `echo ${java} | wc -w` packages
-    > Xorg          : `echo ${xorg} | wc -w` packages
-    \n"
-
-    sleep 2
-
-    chroot ${CHROOT} pacman -S --needed --force --noconfirm `echo ${all}`
-    chroot ${CHROOT} systemctl enable networkmanager
-    return $SUCCESS
-}
-
-# perform system base setup/configurations
-setup_base_system()
-{
-    setup_resolvconf
-    sleep_clear 1
-
-    install_base_packages
-    sleep_clear 1
-
-    setup_resolvconf
-    sleep_clear 1
-
-    setup_fstab
-    sleep_clear 1
-
-    setup_proc_sys_dev
-    sleep_clear 1
-
-    setup_locale
-    sleep_clear 1
-
-    setup_initramfs
-    sleep_clear 1
-
-    setup_hostname
-    sleep_clear 1
-
-    setup_user "root"
-    sleep_clear 1
-
-    ask_user_account
-    sleep_clear 1
-
-    if [ ! -z "${NORMAL_USER}" ]
-    then
-        setup_user "${NORMAL_USER}"
-        sleep_clear 1
-    fi
-
-    setup_extra_packages
-    sleep_clear 1
-
-    setup_bootloader
-    sleep_clear 1
-
-    return $SUCCESS
-}
-
-# update /etc files
-update_etc()
-{
-    title "Arch Linux Setup (Update /etc files)"
-
-    wprintf "[+] Updating /etc files"
-    printf "\n\n"
-
-    # /etc/pacman.conf
-    cp "/etc/pacman.conf" "${CHROOT}/etc/pacman.conf"
-
-    # /etc/*
-    if [ -d "data/etc/" ]
-    then
-        cp "data/etc/"* "${CHROOT}/etc/."
-    else
-        cp "/usr/share/Arch_Linux-install-script/data/etc/"* "${CHROOT}/etc/."
-    fi
-
-    return $SUCCESS
-}
-
-# setup display manager
-setup_display_manager()
-{
-    title "Arch Linux Display Manager Setup"
-
-    wprintf "[+] Setting up gdm display manager"
-    printf "\n"
-
-    printf "
-    > gdm
-    \n"
-
-    sleep 2
-
-    # install gdm packages
-    chroot ${CHROOT} pacman -S gnome gnome-extra gnome-tweak-tool
-
-    # enable in systemd
-    chroot ${CHROOT} systemctl enable gdm
-
-    return $SUCCESS
-}
-
-# ask user for VirtualBox modules+utils setup
-ask_vbox_setup()
-{
-  if confirm "Arch Linux Setup" "[?] Setup VirtualBox modules [y/n]: "
-  then
-      VBOX_SETUP=$TRUE
-  fi
-
-  return $SUCCESS
-}
-
-# setup virtualbox utils
-setup_vbox_utils()
-{
-  title "Arch Linux VirtualBox Setup"
-
-  wprintf "[+] Setting up VirtualBox utils"
-  printf "\n\n"
-
-  chroot ${CHROOT} pacman -S virtualbox-guest-utils \
-      --force --needed --noconfirm
-
-  chroot ${CHROOT} systemctl enable vboxservice
-  chroot ${CHROOT} systemctl enable vboxadd
-  chroot ${CHROOT} systemctl enable vboxadd-service
-  chroot ${CHROOT} systemctl enable vboxadd-x11
-
-  printf "vboxguest\nvboxsf\nvboxvideo\n" \
-      > "${CHROOT}/etc/modules-load.d/vbox.conf"
-
-  return $SUCCESS
-}
-
-#Install yubiPam for authentication and yubikey personalization tool
-setup_yubiauth(){
-  chroot ${CHROOT} cd /usr/local/src
-  chroot ${CHROOT} git clone https://github.com/firnsy/yubipam.git
-  chroot ${CHROOT} cd yubipam
-  chroot ${CHROOT} autoreconf -i
-  chroot ${CHROOT} ./configure
-  chroot ${CHROOT} make install
-  chroot ${CHROOT} groupadd yubiauth
-  chroot ${CHROOT} touch /etc/yubikey
-  chroot ${CHROOT} chgrp yubiauth /etc/yubikey /usr/local/sbin/yk_chkpwd
-  chroot ${CHROOT} chmod g+rw /etc/yubikey
-  chroot ${CHROOT} chmod g+s /usr/local/sbin/yk_chkpwd
-  chroot ${CHROOT} pacman -S yubikey-personalization-gui
-}
-# add user to newly created groups
-update_user_groups()
-{
-    title "Arch Linux User Groups Setup"
-
-    wprintf "[+] Adding user '${NORMAL_USER}' to groups"
-    printf "\n\n"
-
-    chroot ${CHROOT} \
-        usermod -G ${NORMAL_USER},video,audio,vboxsf,wireshark,stunnel
-
-    return $SUCCESS
-}
-
-setup_ruby_on_rails(){
-  title 'Rails Setup'
-  chroot ${CHROOT} gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
-  chroot ${CHROOT} \curl -sSL https://get.rvm.io | bash
-  chroot ${CHROOT} source ${HOME}/.rvm/scripts/rvm
-  chroot ${CHROOT} rvm install ruby 2.2.2
-  chroot ${CHROOT} rvm install rails
-  chroot ${CHROOT} rvm install bundler
-}
-
-setup_extra_config(){
-  chroot ${CHROOT} echo "colo default
-  syntax enable
-  set ts=2
-  set number
-  set smartindent
-  set shiftwidth=2
-  filetype plugin indent on
-  set autoread
-  set smartcase
-  set hlsearch
-  set incsearch
-  set showmatch
-  set noerrorbells
-  set novisualbell
-  set tm=500
-  set nobackup
-  set nowb
-  set noswapfile
-  set smarttab" >> ${HOME}/.vimrc
-}
-
-# controller and program flow
-main()
-{
-    clear
-    check_uid
-    check_env
-
-    # keymap
-    ask_keymap
-    set_keymap
-    clear
-
-    # network
-    ask_hostname
-    sleep_clear 1
-
-    # pacman
-    update_pacman
-    sleep_clear 1
-
-    # hard drive
-    get_hd_devs
-    ask_hd_dev
-    umount_filesystems "harddrive"
-    sleep_clear 1
-    ask_cfdisk
-    sleep_clear 1
-    ask_luks
-    get_partition_label
-    get_partitions
-    print_partitions
-    ask_formatting
-    clear
-    make_partitions
-    clear
-    mount_filesystems
-    sleep_clear 1
-
-    # arch linux
-    setup_base_system
-    sleep_clear 1
-
-    #extra
-    setup_extra_config
-    setup_ruby_on_rails
-    sleep_clear 1
-
-    # epilog
-    umount_filesystems
-    sleep_clear 1
-
-    printf "Installation successfull"
-
-    return $SUCCESS
-}
-
-main "${@}"

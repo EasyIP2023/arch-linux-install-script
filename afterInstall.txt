@@ -1,8 +1,11 @@
 #TODO
 Install GitKraken
+  - yaourt -S gitkraken
 Install Steam
 Install Atom
+  - yaourt -S atom-git
 Install Truecrypt
 Install Keepassx
 Add Fake Mac on Reboot
-Install Yubikey
+Install Arronax
+  - yaourt -S arronax
