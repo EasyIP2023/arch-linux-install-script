@@ -175,47 +175,7 @@ ask_hostname(){
   return $SUCCESS
 }
 
-
-# get available hard disks
-get_hd_devs(){
-  HD_DEVS="`lsblk | grep disk | awk '{print $1}'`"
-  return $SUCCESS
-}
-
-# get partitions
-get_partitions()
-{
-    partitions=`ls ${HD_SDA}* | grep -v "${HD_SDA}\>"`
-
-    while [ \
-        "${HD_BOOT}" = "" -o \
-        "${HD_ROOT}" = "" -o ]
-    do
-        title "Hard Drive Setup"
-        wprintf "[+] Created partitions:"
-        printf "\n\n"
-
-        for i in ${partitions}
-        do
-            echo "    > ${i}"
-        done
-        echo
-
-        wprintf "[?] Boot partition (/dev/sdXY): "
-        read HD_BOOT
-        wprintf "[?] Root partition (/dev/sdXY): "
-        read HD_ROOT
-        wprintf "[?] Swap parition (/dev/sdXY): "
-        read HD_SWAP
-        clear
-    done
-    return $SUCCESS
-}
-
-
-# print partitions and ask for confirmation
-print_partitions()
-{
+print_partitions(){
     i=""
 
     while true
@@ -250,7 +210,7 @@ print_partitions()
 install_base_system(){
   title "Installing Base System"
   printf "Choose a Server"
-  sleep 15
+  sleep 5
   vim /etc/pacman.d/mirrorlist
   pacstrap -i "${CHROOT}" base base-devel
 
@@ -258,12 +218,17 @@ install_base_system(){
 }
 
 before_chroot(){
+  title "Installing System"
   printf "Be Sure to create 3 paritions\nSDA1 = BIOS (Mem=1007KiB fs=ef02)\nSDA2 = ROOT (Mem=<amount>GiB, fs=8300)\nSDA3= Swap (Mem=<amount>MiB, fs=8200)\n"
-  sleep 40
-  get_hd_devs
+  sleep 15
   cgdisk "${HD_SDA}"
 
-  get_partitions
+  wprintf "[?] Boot partition (/dev/sdXY): "
+  read HD_BOOT
+  wprintf "[?] Root partition (/dev/sdXY): "
+  read HD_ROOT
+  wprintf "[?] Swap parition (/dev/sdXY): "
+  read HD_SWAP
   sleep_clear 1
 
   print_partitions
@@ -441,3 +406,5 @@ main(){
 
   return $SUCCESS
 }
+
+main "${@}"
