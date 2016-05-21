@@ -355,12 +355,12 @@ add_bashrc_config(){
   [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
   NORMAL=`echo -e '\033[0m'`
-  RED=`echo -e '\033[91m'`
-  GREEN=`echo -e '\033[0;32m'`
+  RED=`echo -e '\e[1;91m'`
+  GREEN=`echo -e '\e[32m'`
   LGREEN=`echo -e '\033[1;32m'`
   BLUE=`echo -e '\033[0;34m'`
   LBLUE=`echo -e '\033[1;34m'`
-  YELLOW=`echo -e '\033[0;33m'`
+  YELLOW=`echo -e '\e[33m'`
   MAGENTA=`echo -e '\033[0;95m'`
 
 
@@ -380,7 +380,7 @@ add_bashrc_config(){
      }
   alias ifconfig='colored_ip'
 
-  PS1='\e[1;91m\u@\h: \e[33m\W\e[0m\$ '
+  PS1=''${RED}'\u@\h: '${YELLOW}'\W '${GREEN}'\$ '${NORMAL}''
   eval "`dircolors ~/.dir_colors`"
   alias ls='ls --color=auto'
   alias grep='grep --color=auto'
@@ -421,14 +421,11 @@ after_chroot(){
   update_pacman
   sleep_clear 1
 
-  #TODO
-  #Installing Blackarch linux
-  #wget -O /tmp/strap.sh http://blackarch.org/strap.sh
-  #cd /tmp
-  #chmod 777 strap.sh
-  #./strap.sh
-  #pacman -S blackarch --force
-
+  #Installing Blackarch linux Tools
+  chroot "${CHROOT}" wget -O strap.sh http://blackarch.org/strap.sh
+  chroot "${CHROOT}" chmod 777 strap.sh
+  chroot "${CHROOT}" ./strap.sh
+  chroot "${CHROOT}" rm strap.sh 
   title "User Creation"
   chroot "${CHROOT}" passwd
   chroot "${CHROOT}" printf "Enter Normal User username"
