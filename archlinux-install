@@ -275,7 +275,7 @@ install_ruby_on_rails(){
   chroot "${CHROOT}" curl -sSL https://get.rvm.io | bash -s stable
   chroot "${CHROOT}" source ~/.rvm/scripts/rvm
   chroot "${CHROOT}" rvm pkg install openssl
-  chroot "${CHROOT}" printf "Enter Ruby Version"
+  chroot "${CHROOT}" printf "Enter Ruby Version: "
   chroot "${CHROOT}" read RUBY_VERSION
   chroot "${CHROOT}" rvm install "${RUBY_VERSION}" --with-openssl-dir=~/.rvm/usr
   chroot "${CHROOT}" gem install rails
@@ -297,7 +297,7 @@ install_apache_pushion_passenger(){
 
                           RackEnv development
                           <VirtualHost *:80>
-                            ServerName www.${NORMAL_USER}-davis.com
+                            ServerName www.${NORMAL_USER}.com
                             DocumentRoot /home/${NORMAL_USER}/git/gbp_website/public
                             <Directory /home/${NORMAL_USER}/git/gbp_website/public>
                               AllowOverride all
@@ -340,6 +340,66 @@ install_pakages(){
   sleep_clear 1
 }
 
+#TODO
+add_bashrc_config(){
+  chroot "${CHROOT}" echo "#
+  # ~/.bashrc
+  #
+
+  # If not running interactively, don't do anything
+  [[ $- != *i* ]] && return
+
+  #PS1='[\u@\h \W]\$ '
+
+  export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+  [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+
+  NORMAL=`echo -e '\033[0m'`
+  RED=`echo -e '\033[91m'`
+  GREEN=`echo -e '\033[0;32m'`
+  LGREEN=`echo -e '\033[1;32m'`
+  BLUE=`echo -e '\033[0;34m'`
+  LBLUE=`echo -e '\033[1;34m'`
+  YELLOW=`echo -e '\033[0;33m'`
+  MAGENTA=`echo -e '\033[0;95m'`
+
+
+
+  IP4=$LGREEN
+  IP6=$MAGENTA
+  IFACE=$YELLOW
+  DEFAULT_ROUTE=$LBLUE
+
+  IP_CMD=$(which ifconfig)
+  function colored_ip(){
+    ${IP_CMD} $@ | sed \
+      -e "s/inet [^ ]\+ /${IP4}&${RED}/g"\
+      -e "s/inet6 [^ ]\+ /${IP6}&${NORMAL}/g"\
+      -e "s/^default via .*$/${DEFAULT_ROUTE}&${NORMAL}/"\
+      -e "s/^\([0-9]\+: \+\)\([^ \t]\+\)/\1${IFACE}\2${NORMAL}/"
+     }
+  alias ifconfig='colored_ip'
+
+  PS1='\e[1;91m\u@\h: \e[33m\W\e[0m\$ '
+  eval "`dircolors ~/.dir_colors`"
+  alias ls='ls --color=auto'
+  alias grep='grep --color=auto'
+  alias egrep='egrep --color=auto'
+  alias fgrep='fgrep --color=auto'
+  alias vi=vim
+  git_branch () { git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'; }
+  if [ $UID -ne 0 ]; then
+      alias reboot='sudo reboot'
+      alias update='sudo pacman -Syyu'
+      alias svim='sudo vim'
+      alias apache_start='sudo systemctl start httpd.service'
+      alias apache_stop='sudo systemctl stop httpd.service'
+      alias ports='sudo netstat -antp'
+      alias tor_start='sudo systemctl start tor.service'
+      alias tor_stop='sudo systemctl stop tor.service'
+      alias connect_to_work='sudo openconnect private.siu.edu'
+  fi " > /home/"${NORMAL_USER}"/.bashrc
+}
 
 after_chroot(){
   #Uncomment the language
