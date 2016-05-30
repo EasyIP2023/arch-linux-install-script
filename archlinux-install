@@ -33,6 +33,8 @@ CRYPT_ROOT="r00t"
 
 CHROOT="/mnt"
 NORMAL_USER=""
+WLAN=""
+ETHER=""
 
 wprintf(){
   fmt="${1}"
@@ -265,21 +267,21 @@ install_yubikey(){
 
   return $SUCCESS
 }
-#TODO
-#Change it so it installs via reg user
+
 install_ruby_on_rails(){
   title "Install Ruby On rails"
   chroot "${CHROOT}" pacman -S curl --noconfirm
   chroot "${CHROOT}" pacman -S libyaml --noconfirm
   chroot "${CHROOT}" gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
-  chroot "${CHROOT}" curl -sSL https://get.rvm.io | bash -s stable
-  chroot "${CHROOT}" source ~/.rvm/scripts/rvm
+  chroot "${CHROOT}" \curl -sSL https://get.rvm.io | sudo bash -s stable
   chroot "${CHROOT}" rvm pkg install openssl
   chroot "${CHROOT}" printf "Enter Ruby Version: "
   chroot "${CHROOT}" read RUBY_VERSION
-  chroot "${CHROOT}" rvm install "${RUBY_VERSION}" --with-openssl-dir=~/.rvm/usr
+  chroot "${CHROOT}" rvm install "${RUBY_VERSION}" --with-openssl-dir="${HOME}"/.rvm/usr
   chroot "${CHROOT}" gem install rails
   chroot "${CHROOT}" gem install bundler
+  printf "Be sure to install rails and bundler for regular user it's install for root user"
+  sleep 5
 
   return $SUCCESS
 }
@@ -323,13 +325,15 @@ install_pakages(){
   chroot "${CHROOT}" pacman -S jre7-openjdk-headless jre7-openjdk jdk7-openjdk openjdk7-doc openjdk7-src jre8-openjdk-headless jre8-openjdk jdk8-openjdk openjdk8-doc openjdk8-src java-openjfx java-openjfx-doc java-openjfx-src --noconfirm
 
   #install networkmanager
-  chroot "${CHROOT}" pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog gnome-keyring --noconfirm
+  chroot "${CHROOT}" pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog gnome-keyring net-tools --noconfirm
 
   #Install gnome desktop environment
   chroot "${CHROOT}" pacman -S gnome gnome-extra --noconfirm
   chroot "${CHROOT}" pacman -S gnome-tweak-tool --noconfirm
 
-  #Ruby Installed on root user
+  chroot "${CHROOT}" pacman -S tor --noconfirm
+
+  Ruby Installed on root user
   install_ruby_on_rails
   sleep_clear 1
 
@@ -338,10 +342,13 @@ install_pakages(){
 
   install_yubikey
   sleep_clear 1
+  
+  add_bash_config
+  sleep_clear 1
 }
 
-#TODO
-add_bashrc_config(){
+#TODO FIX First chroot command
+add_bash_config(){
   chroot "${CHROOT}" echo "#
   # ~/.bashrc
   #
@@ -362,8 +369,6 @@ add_bashrc_config(){
   LBLUE=`echo -e '\033[1;34m'`
   YELLOW=`echo -e '\e[33m'`
   MAGENTA=`echo -e '\033[0;95m'`
-
-
 
   IP4=$LGREEN
   IP6=$MAGENTA
@@ -397,8 +402,30 @@ add_bashrc_config(){
       alias ports='sudo netstat -antp'
       alias tor_start='sudo systemctl start tor.service'
       alias tor_stop='sudo systemctl stop tor.service'
-      alias connect_to_work='sudo openconnect private.siu.edu'
+      alias orphaned_packets='sudo pacman -Qdt'
   fi " > /home/"${NORMAL_USER}"/.bashrc
+
+  chroot "${CHROOT}" echo "[Unit]
+  Description=macchanger on %I
+  Wants=network-pre.target
+  Before=network-pre.target
+  BindsTo=sys-subsystem-net-devices-%i.device
+  After=sys-subsystem-net-devices-%i.device
+
+  [Service]
+  ExecStart=/usr/bin/macchanger -r %I
+  Type=oneshot
+
+  [Install]
+  WantedBy=multi-user.target" > /etc/systemd/system/macspoof@.service
+
+  chroot "${CHROOT}" ifconfig
+  chroot "${CHROOT}" printf "Enter ethernet address(xx:xx:xx:xx:xx:xx): "
+  chroot "${CHROOT}" read ETHER
+  chroot "${CHROOT}" printf "Enter wireless address(xx:xx:xx:xx:xx:xx): "
+  chroot "${CHROOT}" read WLAN
+  chroot "${CHROOT}" echo 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${ETHER}", NAME="eth0"
+  SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="34:de:1a:53:d2:20", NAME="${WLAN}" '> /etc/udev/rules.d/10-network.ruless
 }
 
 after_chroot(){
@@ -425,7 +452,7 @@ after_chroot(){
   chroot "${CHROOT}" wget -O strap.sh http://blackarch.org/strap.sh
   chroot "${CHROOT}" chmod 777 strap.sh
   chroot "${CHROOT}" ./strap.sh
-  chroot "${CHROOT}" rm strap.sh 
+  chroot "${CHROOT}" rm strap.sh
   title "User Creation"
   chroot "${CHROOT}" passwd
   chroot "${CHROOT}" printf "Enter Normal User username"

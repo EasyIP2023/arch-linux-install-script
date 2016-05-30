@@ -9,3 +9,4 @@ Install Keepassx
 Add Fake Mac on Reboot
 Install Arronax
   - yaourt -S arronax
+system enable macspoof@interface
