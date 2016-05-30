@@ -333,7 +333,6 @@ install_pakages(){
 
   chroot "${CHROOT}" pacman -S tor --noconfirm
 
-  Ruby Installed on root user
   install_ruby_on_rails
   sleep_clear 1
 
@@ -342,7 +341,7 @@ install_pakages(){
 
   install_yubikey
   sleep_clear 1
-  
+
   add_bash_config
   sleep_clear 1
 }
