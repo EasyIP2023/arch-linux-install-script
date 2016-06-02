@@ -310,42 +310,6 @@ install_apache_pushion_passenger(){
   chroot "${CHROOT}" vim /etc/httpd/conf/httpd.conf
 }
 
-install_pakages(){
-  title "Instaling Regularly use Packages"
-  #install some base stuff like graphics (Intel integrated graphics)
-  chroot "${CHROOT}" pacman -S xf86-input-synaptics --noconfirm
-  chroot "${CHROOT}" pacman -S xorg-server xorg-server-utils xorg-xinit xorg-twm xorg-xclock xterm --noconfirm
-  chroot "${CHROOT}" pacman -S mesa --noconfirm
-  chroot "${CHROOT}" pacman -S lib32-mesa-libgl --noconfirm
-  chroot "${CHROOT}" pacman -S firefox --noconfirm
-  chroot "${CHROOT}" pacman -S libreoffice --noconfirm
-  chroot "${CHROOT}" pacman -S bleachbit --noconfirm
-  chroot "${CHROOT}" pacman -S yaourt --noconfirm
-  #install Java
-  chroot "${CHROOT}" pacman -S jre7-openjdk-headless jre7-openjdk jdk7-openjdk openjdk7-doc openjdk7-src jre8-openjdk-headless jre8-openjdk jdk8-openjdk openjdk8-doc openjdk8-src java-openjfx java-openjfx-doc java-openjfx-src --noconfirm
-
-  #install networkmanager
-  chroot "${CHROOT}" pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog gnome-keyring net-tools --noconfirm
-
-  #Install gnome desktop environment
-  chroot "${CHROOT}" pacman -S gnome gnome-extra --noconfirm
-  chroot "${CHROOT}" pacman -S gnome-tweak-tool --noconfirm
-
-  chroot "${CHROOT}" pacman -S tor --noconfirm
-
-  install_ruby_on_rails
-  sleep_clear 1
-
-  install_apache_pushion_passenger
-  sleep_clear 1
-
-  install_yubikey
-  sleep_clear 1
-
-  add_bash_config
-  sleep_clear 1
-}
-
 #TODO FIX First chroot command
 add_bash_config(){
   chroot "${CHROOT}" echo "#
@@ -422,7 +386,44 @@ add_bash_config(){
   chroot "${CHROOT}" printf "Enter wireless address(xx:xx:xx:xx:xx:xx): "
   chroot "${CHROOT}" read WLAN
   chroot "${CHROOT}" echo 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${ETHER}", NAME="eth0"
-  SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="34:de:1a:53:d2:20", NAME="${WLAN}" '> /etc/udev/rules.d/10-network.ruless
+  SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${WLAN}", NAME="wlan0" '> /etc/udev/rules.d/10-network.ruless
+}
+
+install_pakages(){
+  title "Instaling Regularly use Packages"
+  #install some base stuff like graphics (Intel integrated graphics)
+  chroot "${CHROOT}" pacman -S xf86-input-synaptics --noconfirm
+  chroot "${CHROOT}" pacman -S xorg-server xorg-server-utils xorg-xinit xorg-twm xorg-xclock xterm --noconfirm
+  chroot "${CHROOT}" pacman -S mesa --noconfirm
+  chroot "${CHROOT}" pacman -S lib32-mesa-libgl --noconfirm
+  chroot "${CHROOT}" pacman -S firefox --noconfirm
+  chroot "${CHROOT}" pacman -S libreoffice --noconfirm
+  chroot "${CHROOT}" pacman -S bleachbit --noconfirm
+  chroot "${CHROOT}" pacman -S yaourt --noconfirm
+  #install Java
+  chroot "${CHROOT}" pacman -S jre7-openjdk-headless jre7-openjdk jdk7-openjdk openjdk7-doc openjdk7-src jre8-openjdk-headless jre8-openjdk jdk8-openjdk openjdk8-doc openjdk8-src java-openjfx java-openjfx-doc java-openjfx-src --noconfirm
+
+  #install networkmanager
+  chroot "${CHROOT}" pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog gnome-keyring net-tools --noconfirm
+
+  #Install gnome desktop environment
+  chroot "${CHROOT}" pacman -S gnome gnome-extra --noconfirm
+  chroot "${CHROOT}" pacman -S gnome-tweak-tool --noconfirm
+
+  chroot "${CHROOT}" pacman -S tor --noconfirm
+	chroot "${CHROOT}" pacman -S macchanger --noconfirm
+
+  install_ruby_on_rails
+  sleep_clear 1
+
+  install_apache_pushion_passenger
+  sleep_clear 1
+
+  install_yubikey
+  sleep_clear 1
+
+  add_bash_config
+  sleep_clear 1
 }
 
 after_chroot(){

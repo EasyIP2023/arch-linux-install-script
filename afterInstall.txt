@@ -9,4 +9,7 @@ Install Keepassx
 Add Fake Mac on Reboot
 Install Arronax
   - yaourt -S arronax
-system enable macspoof@interface
+Enable macspoofing
+- system enable macspoof@interface
+Change gcc to gcc-multilib (For 32 bit c compilation)
+ - sudo pacman -S gcc-multilib
