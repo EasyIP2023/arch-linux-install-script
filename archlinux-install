@@ -389,8 +389,24 @@ add_bash_config(){
   SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${WLAN}", NAME="wlan0" '> /etc/udev/rules.d/10-network.ruless
 }
 
+#Used for better consumption of power
+install_powertop(){
+  title "Installing Powertop"
+  chroot "${CHROOT}" pacman -S powertop --noconfirm
+  chroot "${CHROOT}" echo "[Unit]
+  Description=Powertop tunings
+
+  [Service]
+  Type=oneshot
+  ExecStart=/usr/bin/powertop --auto-tune
+
+  [Install]
+  WantedBy=multi-user.target" > /etc/systemd/system/powertop.service
+  chroot "${CHROOT}" systemctl enable powertop.service
+}
+
 install_pakages(){
-  title "Instaling Regularly use Packages"
+  title "Installing Regularly use Packages"
   #install some base stuff like graphics (Intel integrated graphics)
   chroot "${CHROOT}" pacman -S xf86-input-synaptics --noconfirm
   chroot "${CHROOT}" pacman -S xorg-server xorg-server-utils xorg-xinit xorg-twm xorg-xclock xterm --noconfirm
@@ -423,6 +439,9 @@ install_pakages(){
   sleep_clear 1
 
   add_bash_config
+  sleep_clear 1
+
+  install_powertop
   sleep_clear 1
 }
 
