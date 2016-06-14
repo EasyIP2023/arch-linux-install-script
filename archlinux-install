@@ -292,21 +292,21 @@ install_apache_pushion_passenger(){
   chroot "${CHROOT}" gem install passenger
   chroot "${CHROOT}" passenger-install-apache2-module
   chroot "${CHROOT}" echo "LoadModule passenger_module /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/gems/passenger-5.0.28/buildout/apache2/mod_passenger.so
-                          <IfModule mod_passenger.c>
-                            PassengerRoot /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/gems/passenger-5.0.28
-                            PassengerDefaultRuby /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/wrappers/ruby
-                          </IfModule>
+  <IfModule mod_passenger.c>
+    PassengerRoot /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/gems/passenger-5.0.28
+    PassengerDefaultRuby /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/wrappers/ruby
+  </IfModule>
 
-                          RackEnv development
-                          <VirtualHost *:80>
-                            ServerName www.${NORMAL_USER}.com
-                            DocumentRoot /home/${NORMAL_USER}/git/gbp_website/public
-                            <Directory /home/${NORMAL_USER}/git/gbp_website/public>
-                              AllowOverride all
-                              Options -MultiViews
-                              Require all granted
-                            </Directory>
-                          </VirtualHost>" >> /etc/httpd/conf/httpd.conf
+  RackEnv development
+  <VirtualHost *:80>
+    ServerName www.${NORMAL_USER}.com
+    DocumentRoot /home/${NORMAL_USER}/git/gbp_website/public
+    <Directory /home/${NORMAL_USER}/git/gbp_website/public>
+      AllowOverride all
+      Options -MultiViews
+      Require all granted
+    </Directory>
+  </VirtualHost>" >> /etc/httpd/conf/httpd.conf
   chroot "${CHROOT}" vim /etc/httpd/conf/httpd.conf
 }
 
