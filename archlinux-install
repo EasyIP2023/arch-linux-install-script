@@ -364,6 +364,7 @@ add_bash_config(){
       alias tor_start='sudo systemctl start tor.service'
       alias tor_stop='sudo systemctl stop tor.service'
       alias orphaned_packets='sudo pacman -Qdt'
+      alias wipe='sudo shred -n 30 -uvz'
   fi " > /home/"${NORMAL_USER}"/.bashrc
 
   chroot "${CHROOT}" echo "[Unit]
@@ -426,14 +427,18 @@ install_pakages(){
   chroot "${CHROOT}" pacman -S gnome gnome-extra --noconfirm
   chroot "${CHROOT}" pacman -S gnome-tweak-tool --noconfirm
 
+  #Networking
   chroot "${CHROOT}" pacman -S tor --noconfirm
 	chroot "${CHROOT}" pacman -S macchanger --noconfirm
+  #FireWall
+  chroot "${CHROOT}" pacman -S ufw --noconfirm
+  chroot "${CHROOT}" pacman -S virtualbox --noconfirm
 
-  install_ruby_on_rails
-  sleep_clear 1
+  #install_ruby_on_rails
+  #sleep_clear 1
 
-  install_apache_pushion_passenger
-  sleep_clear 1
+  #install_apache_pushion_passenger
+  #sleep_clear 1
 
   install_yubikey
   sleep_clear 1
@@ -469,7 +474,7 @@ after_chroot(){
   chroot "${CHROOT}" wget -O strap.sh http://blackarch.org/strap.sh
   chroot "${CHROOT}" chmod 777 strap.sh
   chroot "${CHROOT}" ./strap.sh
-  chroot "${CHROOT}" rm strap.sh
+  chroot "${CHROOT}" shred -n 30 -uvz strap.sh
   title "User Creation"
   chroot "${CHROOT}" passwd
   chroot "${CHROOT}" printf "Enter Normal User username"
