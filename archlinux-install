@@ -211,7 +211,7 @@ print_partitions(){
 
 install_base_system(){
   title "Installing Base System"
-  printf "Choose a Server"
+  wprintf "[+] Choose a Server"
   sleep 5
   vim /etc/pacman.d/mirrorlist
   pacstrap -i "${CHROOT}" base base-devel
@@ -221,7 +221,7 @@ install_base_system(){
 
 before_chroot(){
   title "Installing System"
-  printf "Be Sure to create 3 paritions\nSDA1 = BIOS (Mem=1007KiB fs=ef02)\nSDA2 = ROOT (Mem=<amount>GiB, fs=8300)\nSDA3= Swap (Mem=<amount>MiB, fs=8200)\n"
+  wprintf "Be Sure to create 3 paritions\nSDA1 = BIOS (Mem=1007KiB fs=ef02)\nSDA2 = ROOT (Mem=<amount>GiB, fs=8300)\nSDA3= Swap (Mem=<amount>MiB, fs=8200)\n"
   sleep 15
   cgdisk "${HD_SDA}"
 
@@ -250,7 +250,7 @@ before_chroot(){
 }
 
 install_yubikey(){
-  title "Installing Yubikey For Authentication"
+  title "[+] Installing Yubikey For Authentication"
   #Install yubiPam for authentication and yubikey personalization tool
   chroot "${CHROOT}" cd /usr/local/src
   chroot "${CHROOT}" git clone https://github.com/firnsy/yubipam.git
@@ -312,7 +312,9 @@ install_apache_pushion_passenger(){
 
 #TODO FIX First chroot command
 add_bash_config(){
-  chroot "${CHROOT}" echo "#
+  title "[+] Add Bash Configs"
+
+	chroot "${CHROOT}" echo "#
   # ~/.bashrc
   #
 
@@ -342,7 +344,9 @@ add_bash_config(){
   function colored_ip(){
     ${IP_CMD} $@ | sed \
       -e "s/inet [^ ]\+ /${IP4}&${RED}/g"\
-      -e "s/inet6 [^ ]\+ /${IP6}&${NORMAL}/g"\
+      -e "s/ether [^ ]\+ /${RED}&${NORMAL}/g"\
+      -e "s/netmask [^ ]\+ /${LBLUE}&${NORMAL}/g"\
+      -e "s/broadcast [^ ]\+ /${MAGENTA}&${NORMAL}/g"\
       -e "s/^default via .*$/${DEFAULT_ROUTE}&${NORMAL}/"\
       -e "s/^\([0-9]\+: \+\)\([^ \t]\+\)/\1${IFACE}\2${NORMAL}/"
      }
@@ -365,7 +369,8 @@ add_bash_config(){
       alias tor_stop='sudo systemctl stop tor.service'
       alias orphaned_packets='sudo pacman -Qdt'
       alias wipe='sudo shred -n 30 -uvz'
-  fi " > /home/"${NORMAL_USER}"/.bashrc
+  fi" > /home/"${NORMAL_USER}"/.bashrc
+  chroot "${CHROOT}" source /home/"${NORMAL_USER}"/.bashrc
 
   chroot "${CHROOT}" echo "[Unit]
   Description=macchanger on %I
@@ -381,6 +386,20 @@ add_bash_config(){
   [Install]
   WantedBy=multi-user.target" > /etc/systemd/system/macspoof@.service
 
+  chroot "${CHROOT}" echo "syntax enable
+  colorscheme default
+  set tabstop=2
+  set softtabstop=2
+  set number
+  filetype indent on
+  set wildmenu
+  set lazyredraw
+  set showmatch
+  set incsearch
+  set hlsearch
+  nnoremap <leader><space> :nohlsearch<CR>" > /home/"${NORMAL_USER}"/.vimrc
+  chroot "${CHROOT}" source /home/"${NORMAL_USER}"/.vimrc
+
   chroot "${CHROOT}" ifconfig
   chroot "${CHROOT}" printf "Enter ethernet address(xx:xx:xx:xx:xx:xx): "
   chroot "${CHROOT}" read ETHER
@@ -392,7 +411,7 @@ add_bash_config(){
 
 #Used for better consumption of power
 install_powertop(){
-  title "Installing Powertop"
+  title "[+] Installing Powertop"
   chroot "${CHROOT}" pacman -S powertop --noconfirm
   chroot "${CHROOT}" echo "[Unit]
   Description=Powertop tunings
@@ -452,7 +471,7 @@ install_pakages(){
 
 after_chroot(){
   #Uncomment the language
-  chroot "${CHROOT}" pacman -S vim --noconfirm
+  chroot "${CHROOT}" pacman -Syy vim --noconfirm
   chroot "${CHROOT}" vim /etc/locale.gen
   chroot "${CHROOT}" locale-gen
   chroot "${CHROOT}" echo LANG=en_US.UTF-8 > /etc/locale.conf
