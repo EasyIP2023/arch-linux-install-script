@@ -28,7 +28,6 @@ RUBY_VERSION=""
 BOOT_PART=""
 ROOT_PART=""
 #TODO
-luks=""
 CRYPT_ROOT="r00t"
 
 CHROOT="/mnt"
@@ -223,23 +222,32 @@ before_chroot(){
   title "Installing System"
   wprintf "Be Sure to create 3 paritions\nSDA1 = BIOS (Mem=1007KiB fs=ef02)\nSDA2 = ROOT (Mem=<amount>GiB, fs=8300)\nSDA3= Swap (Mem=<amount>MiB, fs=8200)\n"
   sleep 15
-  cgdisk "${HD_SDA}"
+  cfdisk "${HD_SDA}"
 
   wprintf "[?] Boot partition (/dev/sdXY): "
   read HD_BOOT
   wprintf "[?] Root partition (/dev/sdXY): "
   read HD_ROOT
-  wprintf "[?] Swap parition (/dev/sdXY): "
-  read HD_SWAP
+  #wprintf "[?] Swap parition (/dev/sdXY): "
+  #read HD_SWAP
   sleep_clear 1
 
   print_partitions
   sleep_clear 1
 
-  mkfs.ext4 "${HD_ROOT}"
-  mkswap "${HD_SWAP}"
-  swapon "${HD_SWAP}"
-  mount "${HD_ROOT}" "${CHROOT}"
+  cryptsetup --verbose --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random luksFormat "${HD_ROOT}"
+  cryptsetup open --type luks "${HD_ROOT}" "${CRYPT_ROOT}"
+
+  mkfs.ext4 "${HD_BOOT}"
+  mkfs.ext4 "/dev/mapper/${CRYPT_ROOT}"
+
+  #mkswap "${HD_SWAP}"
+  #swapon "${HD_SWAP}"
+  #mount "${HD_ROOT}" "${CHROOT}"
+
+  mount -t ext4 "/dev/mapper/${CRYPT_ROOT}" "${CHROOT}"
+  mkdir -p "${CHROOT}/boot"
+  mount -t ext4 "${HD_BOOT}" "${CHROOT}/boot"
 
   install_base_system
   sleep_clear 1
@@ -472,7 +480,7 @@ install_pakages(){
 after_chroot(){
   #Uncomment the language
   chroot "${CHROOT}" pacman -Syy vim --noconfirm
-  chroot "${CHROOT}" vim /etc/locale.gen
+  chroot "${CHROOT}" sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen
   chroot "${CHROOT}" locale-gen
   chroot "${CHROOT}" echo LANG=en_US.UTF-8 > /etc/locale.conf
   chroot "${CHROOT}" export LANG=en_US.UTF-8
@@ -498,7 +506,7 @@ after_chroot(){
   chroot "${CHROOT}" passwd
   chroot "${CHROOT}" printf "Enter Normal User username"
   chroot "${CHROOT}" read NORMAL_USER
-  chroot "${CHROOT}" useradd -m -g users -G wheel,storage,power -s /bin/bash "${NORMAL_USER}"
+  chroot "${CHROOT}" useradd -m -g users -G wheel,games,power,optical,storage,scanner,lp,audio,video -s /bin/bash "${NORMAL_USER}"
   chroot "${CHROOT}" passwd "${NORMAL_USER}"
 
   #Uncomment %wheel ALL=(ALL) ALL
@@ -507,16 +515,21 @@ after_chroot(){
 
   #Install grub
   title "Grub Creation"
-  chroot "${CHROOT}" pacman -S grub os-prober --noconfirm
+  chroot "${CHROOT}" pacman -S sudo grub os-prober --noconfirm
+  chroot "${CHROOT}" vim /etc/default/grub
+  chroot "${CHROOT}" vim /etc/mkinitcpio.conf
+  chroot "${CHROOT}" mkinitcpio -p linux
   chroot "${CHROOT}" grub-install --target=i386-pc --recheck "${HD_SDA}"
-  chroot "${CHROOT}" grub-mkconfig -o /boot/grub/grub.cfg
-
+  chroot "${CHROOT}" grub-mkconfig -output /boot/grub/grub.cfg
   sleep_clear 1
   install_pakages
 
   chroot "${CHROOT}" systemctl enable gdm.service
   chroot "${CHOORT}" systemctl enable NetworkManager.service
 
+  umount -R /mnt/boot
+  umount -R /mnt
+  cryptsetup close "${CRYPT_ROOT}"
   return $SUCCESS
 }
 
