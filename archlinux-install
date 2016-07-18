@@ -307,12 +307,16 @@ install_apache_pushion_passenger(){
 
   RackEnv development
   <VirtualHost *:80>
-    ServerName www.${NORMAL_USER}.com
-    DocumentRoot /home/${NORMAL_USER}/git/gbp_website/public
-    <Directory /home/${NORMAL_USER}/git/gbp_website/public>
-      AllowOverride all
-      Options -MultiViews
-      Require all granted
+  ServerName www.vdavis.com
+  DocumentRoot /home/vince/git/mics_website_cms/public
+
+  <Directory /home/vince/git/mics_website_cms/public>
+    Allow from all
+    Options FollowSymLinks
+    AllowOverride None
+    Order allow,deny
+    Options -MultiViews
+    Require all granted
     </Directory>
   </VirtualHost>" >> /etc/httpd/conf/httpd.conf
   chroot "${CHROOT}" vim /etc/httpd/conf/httpd.conf
@@ -377,6 +381,7 @@ add_bash_config(){
       alias tor_stop='sudo systemctl stop tor.service'
       alias orphaned_packets='sudo pacman -Qdt'
       alias wipe='sudo shred -n 30 -uvz'
+      alias rules='sudo ufw status verbose'
   fi" > /home/"${NORMAL_USER}"/.bashrc
   chroot "${CHROOT}" source /home/"${NORMAL_USER}"/.bashrc
 
