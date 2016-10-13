@@ -220,9 +220,10 @@ install_base_system(){
 
 before_chroot(){
   title "Installing System"
-  wprintf "Be Sure to create 3 paritions\nSDA1 = BIOS (Mem=1007KiB fs=ef02)\nSDA2 = ROOT (Mem=<amount>GiB, fs=8300)\nSDA3= Swap (Mem=<amount>MiB, fs=8200)\n"
-  sleep 15
-  cfdisk "${HD_SDA}"
+  # FIRST Thing Wipe Drive
+  # shred --verbose --random-source=/dev/urandom --iterations=3 /dev/sda
+  # Part Drive
+  parted -a optimal /dev/sda mklabel gpt mkpart primary 0% 257Mib name 1 boot mkpart primary 257Mib 100% name 2 root
 
   wprintf "[?] Boot partition (/dev/sdXY): "
   read HD_BOOT
@@ -235,19 +236,18 @@ before_chroot(){
   print_partitions
   sleep_clear 1
 
+  mkfs.btrfs -L boot "${HD_BOOT}"
   cryptsetup --verbose --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random luksFormat "${HD_ROOT}"
   cryptsetup open --type luks "${HD_ROOT}" "${CRYPT_ROOT}"
-
-  mkfs.ext4 "${HD_BOOT}"
-  mkfs.ext4 "/dev/mapper/${CRYPT_ROOT}"
+  mkfs.f2fs -l "/dev/mapper/${CRYPT_ROOT}"
 
   #mkswap "${HD_SWAP}"
   #swapon "${HD_SWAP}"
   #mount "${HD_ROOT}" "${CHROOT}"
 
-  mount -t ext4 "/dev/mapper/${CRYPT_ROOT}" "${CHROOT}"
-  mkdir -p "${CHROOT}/boot"
-  mount -t ext4 "${HD_BOOT}" "${CHROOT}/boot"
+  mount "/dev/mapper/${CRYPT_ROOT}" "${CHROOT}"
+  mkdir "${CHROOT}/boot"
+  mount "${HD_BOOT}" "${CHROOT}/boot"
 
   install_base_system
   sleep_clear 1
@@ -449,6 +449,7 @@ install_pakages(){
   chroot "${CHROOT}" pacman -S libreoffice --noconfirm
   chroot "${CHROOT}" pacman -S bleachbit --noconfirm
   chroot "${CHROOT}" pacman -S yaourt --noconfirm
+  chroot "${CHROOT}" pacman -S bash-completion --noconfirm
   #install Java
   chroot "${CHROOT}" pacman -S jre7-openjdk-headless jre7-openjdk jdk7-openjdk openjdk7-doc openjdk7-src jre8-openjdk-headless jre8-openjdk jdk8-openjdk openjdk8-doc openjdk8-src java-openjfx java-openjfx-doc java-openjfx-src --noconfirm
 
@@ -518,14 +519,20 @@ after_chroot(){
   chroot "${CHROOT}" EDITOR=vim visudo
   chroot "${CHROOT}" pacman -S bash-completion
 
-  #Install grub
-  title "Grub Creation"
-  chroot "${CHROOT}" pacman -S sudo grub os-prober --noconfirm
-  chroot "${CHROOT}" vim /etc/default/grub
+  #Install Boot loader
+  title "Syslinux Creation"
+  chroot "${CHROOT}" pacman -S gptfdisk syslinux --noconfirm
+  chroot "${CHROOT}" syslinux-install_update -iam
+  chroot "${CHROOT}" vim /boot/syslinux/syslinux.cfg
+  # Delete all except
+  # DEFAULT arch
+  # Label arch
+  #     LINUX ../vmlinuz-linux
+  #     APPEND cryptdevice=/dev/sda2:root root=/dev/mapper/root rw
+  #     INITRD ../initramfs-linux.img
   chroot "${CHROOT}" vim /etc/mkinitcpio.conf
+  chroot "${CHROOT}" pacman -S f2fs-tools btrfs-progs
   chroot "${CHROOT}" mkinitcpio -p linux
-  chroot "${CHROOT}" grub-install --target=i386-pc --recheck "${HD_SDA}"
-  chroot "${CHROOT}" grub-mkconfig -output /boot/grub/grub.cfg
   sleep_clear 1
   install_pakages
 
