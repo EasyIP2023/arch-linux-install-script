@@ -18,6 +18,7 @@ SD_BOOT=""
 SD_ROOT=""
 
 CHROOT="root"
+BOOT="boot"
 
 #return codes
 SUCCESS=1337
@@ -176,10 +177,12 @@ main() {
 	fi
 
 	#Partition Drive
-	wprintf "*** Partiioning SD Card ****"
-	parted -a optimal "${SD_CARD}" mklabel gpt mkpart primary 0% 100Mib name 1 boot mkpart primary 100Mib 100% name 2 root
+	wprintf "*** Partiioning SD Card ****\n"
+	parted -a optimal -s "${SD_CARD}" mklabel gpt mkpart primary 0% 100Mib name 1 boot mkpart primary 100Mib 100% name 2 root
 	
-	wprintf "**** Script makes boot /dev/sdX1 and root /dev/sdX2 ****"
+	wprintf "**** Script makes boot /dev/sdX1 and root /dev/sdX2 ****\n"
+	lsblk
+
 	wprintf "[?] Boot partition (/dev/sdXY): "
 	read SD_BOOT
 	wprintf "[?] Root partition (/dev/sdXY): "
@@ -192,13 +195,15 @@ main() {
 
 	#Create and mount the FAT filesystem
 	mkfs.vfat "${SD_BOOT}"
-	mkdir boot
-	mount "${SD_BOOT}" boot
+	mkdir "${BOOT}"
+	mount "${SD_BOOT}" "${BOOT}"
 
 	#Create and mount the ext4 filesytem
 	mkfs.ext4 "${SD_ROOT}"
 	mkdir "${CHROOT}"
 	mount "${SD_ROOT}" "${CHROOT}"
+
+	sleep 30
 
 	#Download and extract root filesystem
 	wprintf "[+] Downloading and extracting root filesystem"
@@ -208,34 +213,34 @@ main() {
 	sleep_clear 1
 
 	#move boot files to the first partition
-	wprintf "[+] Moving boot files to first partition"
+	wprintf "[+] Moving boot files to first partition\n"
 
-	mv "${CHROOT}/boot/*" boot
+	mv ${CHROOT}/boot/* ${BOOT}
 	sleep_clear 1
 
-	needed_packages
-	install_display
-	sleep_clear 1
+	#needed_packages
+	#install_display
+	#sleep_clear 1
 
-	install_wifi
-	sleep_clear 1
+	#install_wifi
+	#sleep_clear 1
 
-	install_bluetooth
-	sleep_clear 1
+	#install_bluetooth
+	#sleep_clear 1
 
 	#Unmount and Remove the file systems
 	wprintf "[-] Unmounting and Removing"
-	umount boot "${CHROOT}"
-	find boot/ "${CHROOT}/" -type f -exec shred -n 30 -uvz {} \;
-	rm -rf boot/ "${CHROOT}/"
+	umount -R "${BOOT}" "${CHROOT}"
+	#find boot/ "${CHROOT}/" -type f -exec shred -n 30 -uvz {} \;
+	#rm -rf boot/ "${CHROOT}/"
 
 	wprintf "FINISED!!! :) \n"
-	wprintf "************     WRITE DOWN        *********************"
-	wprintf "************ Default username: alarm *******************"
-	wprintf "************ Default pass: alarm   *********************"
-	wprintf "******** Defualt pass for root user is root ************"
-	wprintf "********************************************************"
-	wprintf "********************************************************"
+	wprintf "************     WRITE DOWN        *********************\n"
+	wprintf "************ Default username: alarm *******************\n"
+	wprintf "************ Default pass: alarm   *********************\n"
+	wprintf "******** Defualt pass for root user is root ************\n"
+	wprintf "********************************************************\n"
+	wprintf "********************************************************\n"
 
 	return $SUCCESS
 }

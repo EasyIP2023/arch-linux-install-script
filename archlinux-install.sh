@@ -382,6 +382,10 @@ add_bash_config(){
       alias orphaned_packets='sudo pacman -Qdt'
       alias wipe='sudo shred -n 30 -uvz'
       alias rules='sudo ufw status verbose'
+      alias kern-log='journalctl -k --since "20 min ago"'
+      alias kern-make='make -C /lib/modules/$(uname -r)/build M=$PWD modules'
+      alias kern-clean='make -C /lib/modules/$(uname -r)/build M=$PWD clean'
+      alias devices='cat /proc/devices'
   fi" > /home/"${NORMAL_USER}"/.bashrc
   chroot "${CHROOT}" source /home/"${NORMAL_USER}"/.bashrc
 
