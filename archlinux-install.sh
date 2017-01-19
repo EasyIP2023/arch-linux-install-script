@@ -532,7 +532,7 @@ after_chroot(){
   # DEFAULT arch
   # Label arch
   #     LINUX ../vmlinuz-linux
-  #     APPEND cryptdevice=/dev/sda2:root root=/dev/mapper/root rw
+  #     APPEND cryptdevice=/dev/sda2:root root=/dev/mapper/root rw ipv6.disable=1
   #     INITRD ../initramfs-linux.img
   chroot "${CHROOT}" vim /etc/mkinitcpio.conf
   chroot "${CHROOT}" pacman -S f2fs-tools btrfs-progs
