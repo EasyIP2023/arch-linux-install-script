@@ -21,13 +21,13 @@ NC="`tput sgr0`"
 
 HOST_NAME=""
 HD_BOOT=""
-HD_ROOt=""
+HD_ROOT=""
 HD_SWAP=""
 HD_SDA="/dev/sda"
 RUBY_VERSION=""
 BOOT_PART=""
 ROOT_PART=""
-#TODO
+
 CRYPT_ROOT="r00t"
 
 CHROOT="/mnt"
@@ -272,7 +272,7 @@ install_yubikey(){
   chroot "${CHROOT}" chmod g+rw /etc/yubikey
   chroot "${CHROOT}" chmod g+s /usr/local/sbin/yk_chkpwd
   chroot "${CHROOT}" pacman -S yubikey-personalization-gui --noconfirm
-
+  chroot "${CHROOT}" cd
   return $SUCCESS
 }
 
@@ -326,7 +326,7 @@ install_apache_pushion_passenger(){
 #TODO FIX First chroot command
 add_bash_config(){
   title "[+] Add Bash Configs"
-  
+
   chroot "${CHROOT}" echo "#
   # ~/.bashrc
   #
