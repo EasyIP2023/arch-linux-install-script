@@ -281,11 +281,12 @@ install_ruby_on_rails(){
   chroot "${CHROOT}" pacman -S curl --noconfirm
   chroot "${CHROOT}" pacman -S libyaml --noconfirm
   chroot "${CHROOT}" gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
-  chroot "${CHROOT}" \curl -sSL https://get.rvm.io | sudo bash -s stable
+  chroot "${CHROOT}" \curl -sSL https://get.rvm.io | bash
+  chroot "${CHROOT}" source ${NORMAL_USER}/.rvm/bin/rvm
   chroot "${CHROOT}" rvm pkg install openssl
   chroot "${CHROOT}" printf "Enter Ruby Version: "
   chroot "${CHROOT}" read RUBY_VERSION
-  chroot "${CHROOT}" rvm install "${RUBY_VERSION}" --with-openssl-dir="${HOME}"/.rvm/usr
+  #chroot "${CHROOT}" rvm install "${RUBY_VERSION}" --with-openssl-dir="${HOME}"/.rvm/usr
   chroot "${CHROOT}" gem install rails
   chroot "${CHROOT}" gem install bundler
   printf "Be sure to install rails and bundler for regular user it's install for root user"
@@ -295,8 +296,8 @@ install_ruby_on_rails(){
 }
 
 install_apache_pushion_passenger(){
-  chroot "${CHROOT}" pacman -S apache
-  chroot "${CHROOT}" pacman -S mysql
+  chroot "${CHROOT}" pacman -S apache --noconfirm
+  chroot "${CHROOT}" pacman -S mysql --noconfirm
   chroot "${CHROOT}" gem install passenger
   chroot "${CHROOT}" passenger-install-apache2-module
   chroot "${CHROOT}" echo "LoadModule passenger_module /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/gems/passenger-5.0.28/buildout/apache2/mod_passenger.so
@@ -325,8 +326,8 @@ install_apache_pushion_passenger(){
 #TODO FIX First chroot command
 add_bash_config(){
   title "[+] Add Bash Configs"
-
-	chroot "${CHROOT}" echo "#
+  
+  chroot "${CHROOT}" echo "#
   # ~/.bashrc
   #
 
@@ -442,23 +443,22 @@ install_powertop(){
   chroot "${CHROOT}" systemctl enable powertop.service
 }
 
-install_pakages(){
+install_packages(){
   title "Installing Regularly use Packages"
   #install some base stuff like graphics (Intel integrated graphics)
   chroot "${CHROOT}" pacman -S xf86-input-synaptics --noconfirm
   chroot "${CHROOT}" pacman -S xorg-server xorg-server-utils xorg-xinit xorg-twm xorg-xclock xterm --noconfirm
-  chroot "${CHROOT}" pacman -S mesa --noconfirm
   chroot "${CHROOT}" pacman -S lib32-mesa-libgl --noconfirm
   chroot "${CHROOT}" pacman -S firefox --noconfirm
   chroot "${CHROOT}" pacman -S libreoffice --noconfirm
   chroot "${CHROOT}" pacman -S bleachbit --noconfirm
   chroot "${CHROOT}" pacman -S yaourt --noconfirm
-  chroot "${CHROOT}" pacman -S bash-completion --noconfirm
+
   #install Java
   chroot "${CHROOT}" pacman -S jre7-openjdk-headless jre7-openjdk jdk7-openjdk openjdk7-doc openjdk7-src jre8-openjdk-headless jre8-openjdk jdk8-openjdk openjdk8-doc openjdk8-src java-openjfx java-openjfx-doc java-openjfx-src --noconfirm
 
   #install networkmanager
-  chroot "${CHROOT}" pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog gnome-keyring net-tools --noconfirm
+  chroot "${CHROOT}" pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog net-tools --noconfirm
 
   #Install gnome desktop environment
   chroot "${CHROOT}" pacman -S gnome gnome-extra --noconfirm
@@ -490,6 +490,7 @@ install_pakages(){
 after_chroot(){
   #Uncomment the language
   chroot "${CHROOT}" pacman -Syy vim --noconfirm
+  chroot "${CHROOT}" pacman -Syy wget git --noconfirm
   chroot "${CHROOT}" sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen
   chroot "${CHROOT}" locale-gen
   chroot "${CHROOT}" echo LANG=en_US.UTF-8 > /etc/locale.conf
@@ -514,14 +515,14 @@ after_chroot(){
   chroot "${CHROOT}" shred -n 30 -uvz strap.sh
   title "User Creation"
   chroot "${CHROOT}" passwd
-  chroot "${CHROOT}" printf "Enter Normal User username"
+  chroot "${CHROOT}" printf "Enter Normal User username: "
   chroot "${CHROOT}" read NORMAL_USER
   chroot "${CHROOT}" useradd -m -g users -G wheel,games,power,optical,storage,scanner,lp,audio,video -s /bin/bash "${NORMAL_USER}"
   chroot "${CHROOT}" passwd "${NORMAL_USER}"
 
   #Uncomment %wheel ALL=(ALL) ALL
   chroot "${CHROOT}" EDITOR=vim visudo
-  chroot "${CHROOT}" pacman -S bash-completion
+  chroot "${CHROOT}" pacman -S bash-completion --noconfrim
 
   #Install Boot loader
   title "Syslinux Creation"
@@ -535,10 +536,10 @@ after_chroot(){
   #     APPEND cryptdevice=/dev/sda2:root root=/dev/mapper/root rw ipv6.disable=1
   #     INITRD ../initramfs-linux.img
   chroot "${CHROOT}" vim /etc/mkinitcpio.conf
-  chroot "${CHROOT}" pacman -S f2fs-tools btrfs-progs
+  chroot "${CHROOT}" pacman -S f2fs-tools btrfs-progs --noconfirm
   chroot "${CHROOT}" mkinitcpio -p linux
   sleep_clear 1
-  install_pakages
+  install_packages
 
   chroot "${CHROOT}" systemctl enable gdm.service
   chroot "${CHOORT}" systemctl enable NetworkManager.service
