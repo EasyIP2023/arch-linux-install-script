@@ -276,6 +276,7 @@ install_yubikey(){
   return $SUCCESS
 }
 
+#Under Development
 install_ruby_on_rails(){
   title "Install Ruby On rails"
   chroot "${CHROOT}" pacman -S curl --noconfirm
@@ -295,39 +296,42 @@ install_ruby_on_rails(){
   return $SUCCESS
 }
 
+#Subject TO Change
 install_apache_pushion_passenger(){
   chroot "${CHROOT}" pacman -S apache --noconfirm
   chroot "${CHROOT}" pacman -S mysql --noconfirm
   chroot "${CHROOT}" gem install passenger
   chroot "${CHROOT}" passenger-install-apache2-module
-  chroot "${CHROOT}" echo "LoadModule passenger_module /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/gems/passenger-5.0.28/buildout/apache2/mod_passenger.so
+  chroot "${CHROOT}" cat >> /etc/httpd/conf/httpd.conf << EOL
+  LoadModule passenger_module /home/"${NORMAL_USER}"/.rvm/gems/ruby-2.2.2/gems/passenger-5.1.1/buildout/apache2/mod_passenger.so
   <IfModule mod_passenger.c>
-    PassengerRoot /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/gems/passenger-5.0.28
+    PassengerRoot /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/gems/passenger-5.1.1
     PassengerDefaultRuby /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/wrappers/ruby
   </IfModule>
 
-  RackEnv development
   <VirtualHost *:80>
-  ServerName www.vdavis.com
-  DocumentRoot /home/vince/git/mics_website_cms/public
+    ServerName vdavis.com
+    ServerAlias www.vdavis.com
+    ServerAdmin webmaster@localhost
+    DocumentRoot /home/vince/git/housing_portal/public
+    RackEnv development
+    ErrorLog /var/log/httpd/error_log
 
-  <Directory /home/vince/git/mics_website_cms/public>
-    Allow from all
-    Options FollowSymLinks
-    AllowOverride None
-    Order allow,deny
-    Options -MultiViews
-    Require all granted
+
+    <Directory /home/vince/git/mics_website_cms/public>
+      Options FollowSymLinks
+      Require all granted
     </Directory>
-  </VirtualHost>" >> /etc/httpd/conf/httpd.conf
-  chroot "${CHROOT}" vim /etc/httpd/conf/httpd.conf
+  </VirtualHost>
+  EOL
 }
 
 #TODO FIX First chroot command
 add_bash_config(){
   title "[+] Add Bash Configs"
 
-  chroot "${CHROOT}" echo "#
+  chroot "${CHROOT}" cat > /home/"${NORMAL_USER}"/.bashrc << EOL
+  #
   # ~/.bashrc
   #
 
@@ -387,10 +391,13 @@ add_bash_config(){
       alias kern-make='make -C /lib/modules/$(uname -r)/build M=$PWD modules'
       alias kern-clean='make -C /lib/modules/$(uname -r)/build M=$PWD clean'
       alias devices='cat /proc/devices'
-  fi" > /home/"${NORMAL_USER}"/.bashrc
+  fi
+  EOL
+  
   chroot "${CHROOT}" source /home/"${NORMAL_USER}"/.bashrc
 
-  chroot "${CHROOT}" echo "[Unit]
+  chroot "${CHROOT}" cat > /etc/systemd/system/macspoof@.service << EOL
+  [Unit]
   Description=macchanger on %I
   Wants=network-pre.target
   Before=network-pre.target
@@ -402,9 +409,11 @@ add_bash_config(){
   Type=oneshot
 
   [Install]
-  WantedBy=multi-user.target" > /etc/systemd/system/macspoof@.service
-
-  chroot "${CHROOT}" echo "syntax enable
+  WantedBy=multi-user.target 
+  EOL
+  
+  chroot "${CHROOT}" cat > /home/"${NORMAL_USER}"/.vimrc << EOL
+  syntax enable
   colorscheme default
   set tabstop=2
   set softtabstop=2
@@ -415,23 +424,30 @@ add_bash_config(){
   set showmatch
   set incsearch
   set hlsearch
-  nnoremap <leader><space> :nohlsearch<CR>" > /home/"${NORMAL_USER}"/.vimrc
+  nnoremap <leader><space> :nohlsearch<CR> 
+  EOL
+  
   chroot "${CHROOT}" source /home/"${NORMAL_USER}"/.vimrc
 
+  sleep_clear 1
+  title "[+] Network Interface Name Change"
   chroot "${CHROOT}" ifconfig
   chroot "${CHROOT}" printf "Enter ethernet address(xx:xx:xx:xx:xx:xx): "
   chroot "${CHROOT}" read ETHER
   chroot "${CHROOT}" printf "Enter wireless address(xx:xx:xx:xx:xx:xx): "
   chroot "${CHROOT}" read WLAN
-  chroot "${CHROOT}" echo 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${ETHER}", NAME="eth0"
-  SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${WLAN}", NAME="wlan0" '> /etc/udev/rules.d/10-network.ruless
+  chroot "${CHROOT}" cat > /etc/udev/rules.d/10-network.rules << EOL
+  SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${ETHER}", NAME="eth0"
+  SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${WLAN}", NAME="wlan0" 
+  EOL
 }
 
 #Used for better consumption of power
 install_powertop(){
   title "[+] Installing Powertop"
   chroot "${CHROOT}" pacman -S powertop --noconfirm
-  chroot "${CHROOT}" echo "[Unit]
+  chroot "${CHROOT}" cat > /etc/systemd/system/powertop.service << EOL 
+  [Unit]
   Description=Powertop tunings
 
   [Service]
@@ -439,7 +455,9 @@ install_powertop(){
   ExecStart=/usr/bin/powertop --auto-tune
 
   [Install]
-  WantedBy=multi-user.target" > /etc/systemd/system/powertop.service
+  WantedBy=multi-user.target
+  EOL
+  
   chroot "${CHROOT}" systemctl enable powertop.service
 }
 
@@ -466,7 +484,7 @@ install_packages(){
 
   #Networking
   chroot "${CHROOT}" pacman -S tor --noconfirm
-	chroot "${CHROOT}" pacman -S macchanger --noconfirm
+  chroot "${CHROOT}" pacman -S macchanger --noconfirm
   #FireWall
   chroot "${CHROOT}" pacman -S ufw --noconfirm
   chroot "${CHROOT}" pacman -S virtualbox --noconfirm
