@@ -305,8 +305,8 @@ install_apache_pushion_passenger(){
   chroot "${CHROOT}" cat >> /etc/httpd/conf/httpd.conf << EOL
   LoadModule passenger_module /home/"${NORMAL_USER}"/.rvm/gems/ruby-2.2.2/gems/passenger-5.1.1/buildout/apache2/mod_passenger.so
   <IfModule mod_passenger.c>
-    PassengerRoot /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/gems/passenger-5.1.1
-    PassengerDefaultRuby /home/${NORMAL_USER}/.rvm/gems/ruby-2.2.2/wrappers/ruby
+    PassengerRoot /home/"${NORMAL_USER}"/.rvm/gems/ruby-2.2.2/gems/passenger-5.1.1
+    PassengerDefaultRuby /home/"${NORMAL_USER}"/.rvm/gems/ruby-2.2.2/wrappers/ruby
   </IfModule>
 
   <VirtualHost *:80>
@@ -323,7 +323,7 @@ install_apache_pushion_passenger(){
       Require all granted
     </Directory>
   </VirtualHost>
-  EOL
+	EOL
 }
 
 #TODO FIX First chroot command
@@ -531,9 +531,11 @@ after_chroot(){
   chroot "${CHROOT}" chmod 777 strap.sh
   chroot "${CHROOT}" ./strap.sh
   chroot "${CHROOT}" shred -n 30 -uvz strap.sh
-  title "User Creation"
+  
+	title "[+] User Creation"
   chroot "${CHROOT}" passwd
-  chroot "${CHROOT}" printf "Enter Normal User username: "
+  
+	wprintf "Enter Normal User username: "
   chroot "${CHROOT}" read NORMAL_USER
   chroot "${CHROOT}" useradd -m -g users -G wheel,games,power,optical,storage,scanner,lp,audio,video -s /bin/bash "${NORMAL_USER}"
   chroot "${CHROOT}" passwd "${NORMAL_USER}"
