@@ -412,7 +412,7 @@ add_bash_config(){
   WantedBy=multi-user.target 
   EOL
   
-  chroot "${CHROOT}" cat > /home/"${NORMAL_USER}"/.vimrc << EOL
+  chroot "${CHROOT}" cat >> /etc/vimrc << EOL
   syntax enable
   colorscheme default
   set tabstop=2
@@ -424,10 +424,7 @@ add_bash_config(){
   set showmatch
   set incsearch
   set hlsearch
-  nnoremap <leader><space> :nohlsearch<CR> 
   EOL
-  
-  chroot "${CHROOT}" source /home/"${NORMAL_USER}"/.vimrc
 
   sleep_clear 1
   title "[+] Network Interface Name Change"
