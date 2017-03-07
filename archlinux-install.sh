@@ -17,18 +17,16 @@ REDB="`tput bold; tput setaf 1`"
 YELLOW="`tput setaf 3`"
 YELLOWB="`tput bold ; tput setaf 3`"
 BLINK="`tput blink`"
-NC="`tput sgr0`"
 
 HOST_NAME=""
 HD_BOOT=""
 HD_ROOT=""
-HD_SWAP=""
 HD_SDA="/dev/sda"
 RUBY_VERSION=""
 BOOT_PART=""
 ROOT_PART=""
 
-CRYPT_ROOT="r00t"
+CRYPT_ROOT="root"
 
 CHROOT="/mnt"
 NORMAL_USER=""
@@ -186,7 +184,6 @@ print_partitions(){
         printf "\n
     > /boot     : ${HD_BOOT}
     > /         : ${HD_ROOT}
-    > swap      : ${HD_SWAP}
     \n"
         wprintf "[?] Are the partition table correct [y/n]: "
         read i
@@ -229,8 +226,6 @@ before_chroot(){
   read HD_BOOT
   wprintf "[?] Root partition (/dev/sdXY): "
   read HD_ROOT
-  #wprintf "[?] Swap parition (/dev/sdXY): "
-  #read HD_SWAP
   sleep_clear 1
 
   print_partitions
@@ -240,11 +235,6 @@ before_chroot(){
   cryptsetup --verbose --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random luksFormat "${HD_ROOT}"
   cryptsetup open --type luks "${HD_ROOT}" "${CRYPT_ROOT}"
   mkfs.f2fs -l "/dev/mapper/${CRYPT_ROOT}"
-
-  #mkswap "${HD_SWAP}"
-  #swapon "${HD_SWAP}"
-  #mount "${HD_ROOT}" "${CHROOT}"
-
   mount "/dev/mapper/${CRYPT_ROOT}" "${CHROOT}"
   mkdir "${CHROOT}/boot"
   mount "${HD_BOOT}" "${CHROOT}/boot"
@@ -257,6 +247,7 @@ before_chroot(){
   return $SUCCESS
 }
 
+#Under development
 install_yubikey(){
   title "[+] Installing Yubikey For Authentication"
   #Install yubiPam for authentication and yubikey personalization tool
@@ -296,7 +287,7 @@ install_ruby_on_rails(){
   return $SUCCESS
 }
 
-#Subject TO Change
+#Under Development
 install_apache_pushion_passenger(){
   chroot "${CHROOT}" pacman -S apache --noconfirm
   chroot "${CHROOT}" pacman -S mysql --noconfirm
@@ -323,7 +314,9 @@ install_apache_pushion_passenger(){
       Require all granted
     </Directory>
   </VirtualHost>
-	EOL
+  EOL
+  
+  return $SUCCESS
 }
 
 #TODO FIX First chroot command
@@ -340,8 +333,8 @@ add_bash_config(){
 
   #PS1='[\u@\h \W]\$ '
   PS1='\[\e[1;91m\]\u@\h: \[\e[33m\]\W \[\e[32m\]\$ \[\033[0m\]'
-  export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-  [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+  #export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+  #[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
   NORMAL=`echo -e '\033[0m'`
   RED=`echo -e '\e[1;91m'`
@@ -368,13 +361,11 @@ add_bash_config(){
       -e "s/^\([0-9]\+: \+\)\([^ \t]\+\)/\1${IFACE}\2${NORMAL}/"
      }
   alias ifconfig='colored_ip'
-  eval "`dircolors ~/.dir_colors`"
   alias ls='ls --color=auto'
   alias grep='grep --color=auto'
   alias egrep='egrep --color=auto'
   alias fgrep='fgrep --color=auto'
   alias vi=vim
-  git_branch () { git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'; }
   if [ $UID -ne 0 ]; then
       alias reboot='sudo reboot'
       alias update='sudo pacman -Syyu'
@@ -394,8 +385,6 @@ add_bash_config(){
   fi
   EOL
   
-  chroot "${CHROOT}" source /home/"${NORMAL_USER}"/.bashrc
-
   chroot "${CHROOT}" cat > /etc/systemd/system/macspoof@.service << EOL
   [Unit]
   Description=macchanger on %I
@@ -427,6 +416,7 @@ add_bash_config(){
   EOL
 
   sleep_clear 1
+  
   title "[+] Network Interface Name Change"
   chroot "${CHROOT}" ifconfig
   chroot "${CHROOT}" printf "Enter ethernet address(xx:xx:xx:xx:xx:xx): "
@@ -437,6 +427,8 @@ add_bash_config(){
   SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${ETHER}", NAME="eth0"
   SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${WLAN}", NAME="wlan0" 
   EOL
+  
+  return $SUCCESS
 }
 
 #Used for better consumption of power
@@ -454,15 +446,25 @@ install_powertop(){
   [Install]
   WantedBy=multi-user.target
   EOL
-  
   chroot "${CHROOT}" systemctl enable powertop.service
+  
+  return $SUCCESS
+}
+
+install_desktop_environment(){
+  title "[+] Installing Desktop Environment"
+  chroot "${CHROOT}" pacman -S deepin deepin-extra --noconfirm
+  chroot "${CHROOT}" sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-deepin-greeter/g' /etc/lightdm/lightdm.conf
+  chroot "${CHROOT}" systemctl enable lightdm.service
+  
+  return $SUCCESS
 }
 
 install_packages(){
   title "Installing Regularly use Packages"
   #install some base stuff like graphics (Intel integrated graphics)
   chroot "${CHROOT}" pacman -S xf86-input-synaptics --noconfirm
-  chroot "${CHROOT}" pacman -S xorg-server xorg-server-utils xorg-xinit xorg-twm xorg-xclock xterm --noconfirm
+  chroot "${CHROOT}" pacman -S xorg --noconfirm
   chroot "${CHROOT}" pacman -S lib32-mesa-libgl --noconfirm
   chroot "${CHROOT}" pacman -S firefox --noconfirm
   chroot "${CHROOT}" pacman -S libreoffice --noconfirm
@@ -474,17 +476,19 @@ install_packages(){
 
   #install networkmanager
   chroot "${CHROOT}" pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog net-tools --noconfirm
+  chroot "${CHOORT}" systemctl enable NetworkManager.service
 
-  #Install gnome desktop environment
-  chroot "${CHROOT}" pacman -S gnome gnome-extra --noconfirm
-  chroot "${CHROOT}" pacman -S gnome-tweak-tool --noconfirm
-
+  #Install deepin desktop environments
+  install_desktop_environment
+  
   #Networking
   chroot "${CHROOT}" pacman -S tor --noconfirm
   chroot "${CHROOT}" pacman -S macchanger --noconfirm
   #FireWall
   chroot "${CHROOT}" pacman -S ufw --noconfirm
-  chroot "${CHROOT}" pacman -S virtualbox --noconfirm
+  
+  #Virtualization
+  chroot "${CHROOT}" pacman -S qemu qemu-arch-extra --noconfirm
 
   #install_ruby_on_rails
   #sleep_clear 1
@@ -492,14 +496,16 @@ install_packages(){
   #install_apache_pushion_passenger
   #sleep_clear 1
 
-  install_yubikey
-  sleep_clear 1
+  #install_yubikey
+  #sleep_clear 1
 
   add_bash_config
   sleep_clear 1
 
   install_powertop
   sleep_clear 1
+  
+  return $SUCCESS
 }
 
 after_chroot(){
@@ -529,10 +535,10 @@ after_chroot(){
   chroot "${CHROOT}" ./strap.sh
   chroot "${CHROOT}" shred -n 30 -uvz strap.sh
   
-	title "[+] User Creation"
+  title "[+] User Creation"
   chroot "${CHROOT}" passwd
   
-	wprintf "Enter Normal User username: "
+  wprintf "Enter Normal User username: "
   chroot "${CHROOT}" read NORMAL_USER
   chroot "${CHROOT}" useradd -m -g users -G wheel,games,power,optical,storage,scanner,lp,audio,video -s /bin/bash "${NORMAL_USER}"
   chroot "${CHROOT}" passwd "${NORMAL_USER}"
@@ -545,24 +551,23 @@ after_chroot(){
   title "Syslinux Creation"
   chroot "${CHROOT}" pacman -S gptfdisk syslinux --noconfirm
   chroot "${CHROOT}" syslinux-install_update -iam
-  chroot "${CHROOT}" vim /boot/syslinux/syslinux.cfg
-  # Delete all except
-  # DEFAULT arch
-  # Label arch
-  #     LINUX ../vmlinuz-linux
-  #     APPEND cryptdevice=/dev/sda2:root root=/dev/mapper/root rw ipv6.disable=1
-  #     INITRD ../initramfs-linux.img
+  chroot "${CHROOT}" vim 
+  chroot "${CHROOT}" cat > /boot/syslinux/syslinux.cfg << "EOF"
+  DEFAULT arch
+  Label arch
+ 	LINUX ../vmlinuz-linux
+ 	APPEND cryptdevice=/dev/sda2:root root=/dev/mapper/root rw ipv6.disable=1
+  	INITRD ../initramfs-linux.img
+  EOL
+  
   chroot "${CHROOT}" vim /etc/mkinitcpio.conf
   chroot "${CHROOT}" pacman -S f2fs-tools btrfs-progs --noconfirm
   chroot "${CHROOT}" mkinitcpio -p linux
+  
   sleep_clear 1
   install_packages
 
-  chroot "${CHROOT}" systemctl enable gdm.service
-  chroot "${CHOORT}" systemctl enable NetworkManager.service
-
-  umount -R /mnt/boot
-  umount -R /mnt
+  umount -Rv "${CHROOT}"
   cryptsetup close "${CRYPT_ROOT}"
   return $SUCCESS
 }
