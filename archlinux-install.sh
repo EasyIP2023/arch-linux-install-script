@@ -247,7 +247,6 @@ before_chroot(){
   return $SUCCESS
 }
 
-#Under development
 install_yubikey(){
   title "[+] Installing Yubikey For Authentication"
   #Install yubiPam for authentication and yubikey personalization tool
@@ -267,7 +266,6 @@ install_yubikey(){
   return $SUCCESS
 }
 
-#Under Development
 install_ruby_on_rails(){
   title "Install Ruby On rails"
   chroot "${CHROOT}" pacman -S curl --noconfirm
@@ -287,13 +285,12 @@ install_ruby_on_rails(){
   return $SUCCESS
 }
 
-#Under Development
 install_apache_pushion_passenger(){
   chroot "${CHROOT}" pacman -S apache --noconfirm
   chroot "${CHROOT}" pacman -S mysql --noconfirm
   chroot "${CHROOT}" gem install passenger
   chroot "${CHROOT}" passenger-install-apache2-module
-  chroot "${CHROOT}" cat >> /etc/httpd/conf/httpd.conf << EOL
+  chroot "${CHROOT}" cat >> /etc/httpd/conf/httpd.conf << "EOF"
   LoadModule passenger_module /home/"${NORMAL_USER}"/.rvm/gems/ruby-2.2.2/gems/passenger-5.1.1/buildout/apache2/mod_passenger.so
   <IfModule mod_passenger.c>
     PassengerRoot /home/"${NORMAL_USER}"/.rvm/gems/ruby-2.2.2/gems/passenger-5.1.1
@@ -314,16 +311,15 @@ install_apache_pushion_passenger(){
       Require all granted
     </Directory>
   </VirtualHost>
-  EOL
+  EOF
   
   return $SUCCESS
 }
 
-#TODO FIX First chroot command
 add_bash_config(){
   title "[+] Add Bash Configs"
 
-  chroot "${CHROOT}" cat > /home/"${NORMAL_USER}"/.bashrc << EOL
+  chroot "${CHROOT}" cat > /home/"${NORMAL_USER}"/.bashrc << "EOF"
   #
   # ~/.bashrc
   #
@@ -383,9 +379,9 @@ add_bash_config(){
       alias kern-clean='make -C /lib/modules/$(uname -r)/build M=$PWD clean'
       alias devices='cat /proc/devices'
   fi
-  EOL
+  EOF
   
-  chroot "${CHROOT}" cat > /etc/systemd/system/macspoof@.service << EOL
+  chroot "${CHROOT}" cat > /etc/systemd/system/macspoof@.service << "EOF"
   [Unit]
   Description=macchanger on %I
   Wants=network-pre.target
@@ -399,9 +395,9 @@ add_bash_config(){
 
   [Install]
   WantedBy=multi-user.target 
-  EOL
+  EOF
   
-  chroot "${CHROOT}" cat >> /etc/vimrc << EOL
+  chroot "${CHROOT}" cat >> /etc/vimrc << "EOF"
   syntax enable
   colorscheme default
   set tabstop=2
@@ -413,7 +409,7 @@ add_bash_config(){
   set showmatch
   set incsearch
   set hlsearch
-  EOL
+  EOF
 
   sleep_clear 1
   
@@ -423,10 +419,10 @@ add_bash_config(){
   chroot "${CHROOT}" read ETHER
   chroot "${CHROOT}" printf "Enter wireless address(xx:xx:xx:xx:xx:xx): "
   chroot "${CHROOT}" read WLAN
-  chroot "${CHROOT}" cat > /etc/udev/rules.d/10-network.rules << EOL
+  chroot "${CHROOT}" cat > /etc/udev/rules.d/10-network.rules << "EOF"
   SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${ETHER}", NAME="eth0"
   SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${WLAN}", NAME="wlan0" 
-  EOL
+  EOF
   
   return $SUCCESS
 }
@@ -550,15 +546,14 @@ after_chroot(){
   #Install Boot loader
   title "Syslinux Creation"
   chroot "${CHROOT}" pacman -S gptfdisk syslinux --noconfirm
-  chroot "${CHROOT}" syslinux-install_update -iam
-  chroot "${CHROOT}" vim 
+  chroot "${CHROOT}" syslinux-install_update -iam 
   chroot "${CHROOT}" cat > /boot/syslinux/syslinux.cfg << "EOF"
   DEFAULT arch
   Label arch
- 	LINUX ../vmlinuz-linux
- 	APPEND cryptdevice=/dev/sda2:root root=/dev/mapper/root rw ipv6.disable=1
+ 	  LINUX ../vmlinuz-linux
+ 	  APPEND cryptdevice=/dev/sda2:root root=/dev/mapper/root rw ipv6.disable=1
   	INITRD ../initramfs-linux.img
-  EOL
+  EOF
   
   chroot "${CHROOT}" vim /etc/mkinitcpio.conf
   chroot "${CHROOT}" pacman -S f2fs-tools btrfs-progs --noconfirm
