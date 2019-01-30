@@ -266,103 +266,8 @@ install_yubikey(){
   return $SUCCESS
 }
 
-install_apache_pushion_passenger(){
-  chroot "${CHROOT}" pacman -S apache --noconfirm
-  chroot "${CHROOT}" pacman -S mysql --noconfirm
-  chroot "${CHROOT}" gem install passenger
-  chroot "${CHROOT}" passenger-install-apache2-module
-  chroot "${CHROOT}" cat >> /etc/httpd/conf/httpd.conf << "EOF"
-  LoadModule passenger_module /home/"${NORMAL_USER}"/.rvm/gems/ruby-2.2.2/gems/passenger-5.1.1/buildout/apache2/mod_passenger.so
-  <IfModule mod_passenger.c>
-    PassengerRoot /home/"${NORMAL_USER}"/.rvm/gems/ruby-2.2.2/gems/passenger-5.1.1
-    PassengerDefaultRuby /home/"${NORMAL_USER}"/.rvm/gems/ruby-2.2.2/wrappers/ruby
-  </IfModule>
-
-  <VirtualHost *:80>
-    ServerName vdavis.com
-    ServerAlias www.vdavis.com
-    ServerAdmin webmaster@localhost
-    DocumentRoot /home/vince/git/housing_portal/public
-    RackEnv development
-    ErrorLog /var/log/httpd/error_log
-
-
-    <Directory /home/vince/git/mics_website_cms/public>
-      Options FollowSymLinks
-      Require all granted
-    </Directory>
-  </VirtualHost>
-  EOF
-
-  return $SUCCESS
-}
-
 add_bash_config(){
   title "[+] Add Bash Configs"
-
-  chroot "${CHROOT}" cat > /home/"${NORMAL_USER}"/.bashrc << "EOF"
-  #
-  # ~/.bashrc
-  #
-
-  # If not running interactively, don't do anything
-  [[ $- != *i* ]] && return
-  PS1='\[\e[1;91m\]\u@\h: \[\e[33m\]\W \[\e[32m\]\$ \[\033[0m\]'
-
-  alias ls='ls --color=auto'
-
-  # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-  export PATH="$PATH:$HOME/.rvm/bin"
-  #[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
-
-  NORMAL=`echo -e '\033[0m'`
-  RED=`echo -e '\e[1;91m'`
-  GREEN=`echo -e '\e[32m'`
-  LGREEN=`echo -e '\033[1;32m'`
-  BLUE=`echo -e '\033[0;34m'`
-  LBLUE=`echo -e '\033[1;34m'`
-  YELLOW=`echo -e '\e[33m'`
-  MAGENTA=`echo -e '\033[0;95m'`
-  IP4=$LGREEN
-  IP6=$MAGENTA
-  IFACE=$YELLOW
-  DEFAULT_ROUTE=$LBLUE
-  IP_CMD=$(which ifconfig)
-
-  function colored_ip(){
-    ${IP_CMD} $@ | sed \
-      -e "s/inet [^ ]\+ /${IP4}&${RED}/g"\
-      -e "s/ether [^ ]\+ /${RED}&${NORMAL}/g"\
-      -e "s/netmask [^ ]\+ /${LBLUE}&${NORMAL}/g"\
-      -e "s/broadcast [^ ]\+ /${MAGENTA}&${NORMAL}/g"\
-      -e "s/^default via .*$/${DEFAULT_ROUTE}&${NORMAL}/"\
-      -e "s/^\([0-9]\+: \+\)\([^ \t]\+\)/\1${IFACE}\2${NORMAL}/"
-  }
-
-  alias ifconfig='colored_ip'
-  alias ls='ls --color=auto'
-  alias grep='grep --color=auto'
-  alias egrep='egrep --color=auto'
-  alias fgrep='fgrep --color=auto'
-  alias vi=vim
-  alias convert_to_haml="find . -name \*.erb -print | sed 'p;s/.erb$/.haml/' | xargs -n2 html2haml"
-  if [ $UID -ne 0 ]; then
-    alias reboot='sudo reboot'
-    alias update='sudo pacman -Syyu'
-    alias svim='sudo vim'
-    alias apache_start='sudo systemctl start httpd.service'
-    alias apache_stop='sudo systemctl stop httpd.service'
-    alias ports='sudo netstat -antp'
-    alias tor_start='sudo systemctl start tor.service'
-    alias tor_stop='sudo systemctl stop tor.service'
-    alias orphaned_packets='sudo pacman -Qdt'
-    alias rules='sudo ufw status verbose'
-    alias kern-log='journalctl -k --since "20 min ago"'
-    alias kern-make='make -C /lib/modules/$(uname -r)/build M=$PWD modules'
-    alias kern-clean='make -C /lib/modules/$(uname -r)/build M=$PWD clean'
-    alias devices='cat /proc/devices'
-  fi
-  EOF
 
   chroot "${CHROOT}" cat > /etc/systemd/system/macspoof@.service << "EOF"
   [Unit]
@@ -447,28 +352,30 @@ install_packages(){
   chroot "${CHROOT}" pacman -S libreoffice --noconfirm
   chroot "${CHROOT}" pacman -S bleachbit --noconfirm
   chroot "${CHROOT}" pacman -S yaourt --noconfirm
+  chroot "${CHROOT}" pacman -S evince --noconfirm
+  chroot "${CHROOT}" pacman -S alsa pulseaudio --noconfirm
+  chroot "${CHROOT}" pacman -S nautilus --noconfirm
 
   #install Java
   chroot "${CHROOT}" pacman -S jre7-openjdk-headless jre7-openjdk jdk7-openjdk openjdk7-doc openjdk7-src jre8-openjdk-headless jre8-openjdk jdk8-openjdk openjdk8-doc openjdk8-src java-openjfx java-openjfx-doc java-openjfx-src --noconfirm
 
   #install networkmanager
   chroot "${CHROOT}" pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog net-tools --noconfirm
+  chroot "${CHROOT}" pacman -S network-manager-applet nm-connection-editor --noconfirm
   chroot "${CHOORT}" systemctl enable NetworkManager.service
-
-  #Install i3 desktop environment
-  install_desktop_environment
 
   #Networking
   chroot "${CHROOT}" pacman -S tor --noconfirm
   chroot "${CHROOT}" pacman -S macchanger --noconfirm
+
   #FireWall
   chroot "${CHROOT}" pacman -S ufw --noconfirm
 
   #Virtualization
   chroot "${CHROOT}" pacman -S qemu qemu-arch-extra --noconfirm
 
-  #install_apache_pushion_passenger
-  #sleep_clear 1
+  #Install i3 desktop environment
+  install_desktop_environment
 
   #install_yubikey
   #sleep_clear 1
