@@ -188,7 +188,6 @@ install_bootloader () {
   pacman -S gptfdisk syslinux --noconfirm
   syslinux-install_update -iam
   vim /boot/syslinux/syslinux.cfg
-
   vim /etc/mkinitcpio.conf
   pacman -S f2fs-tools btrfs-progs --noconfirm
   mkinitcpio -p linux
@@ -210,11 +209,18 @@ install_graphics_audio_and_others () {
   pacman -S alsa pulseaudio pulseaudio-alsa volumeicon --noconfirm
   pacman -S playerctl --noconfirm
   pacman -S nautilus --noconfirm
+  pacman -S gnome-screenshot --noconfirm
+  pacman -S nitrogen --noconfirm
+  pacman -S xcompmgr --noconfirm
+
+  return $SUCCESS
 }
 
 install_java () {
   title "Java Install"
   pacman -S jre-openjdk-headless jre-openjdk jdk-openjdk openjdk-doc openjdk-src jre10-openjdk-headless jre10-openjdk jdk10-openjdk openjdk10-doc openjdk10-src java-openjfx java-openjfx-doc java-openjfx-src --noconfirm
+
+  return $SUCCESS
 }
 
 install_networking () {
@@ -227,26 +233,37 @@ install_networking () {
   pacman -S macchanger --noconfirm
   # FireWall
   pacman -S ufw --noconfirm
+
+  return $SUCCESS
 }
 
 install_virtul_soft () {
   title "Installing VM Software"
   pacman -S qemu qemu-arch-extra --noconfirm
+
+  return $SUCCESS
 }
 
 install_de () {
   title "Installing Desktop Environment"
   # Install desktop environment
   pacman -S i3 xorg-xinit --noconfirm
+
   # Add exec i3 to file and comment out exec xterm
-  vim /etc/X11/xinit/xinitrc
-  # Replace ExecStart=... with ExecStart=-/usr/bin/agetty --autologin <username> --noclear %I $TERM
+  sed -i 's/#exec xterm -geometry 80x66+0+0 -name login/exec i3/g' /etc/X11/xinit/xinitrc
+  cat "Replace ExecStart=... with ExecStart=-/usr/bin/agetty --autologin <username> --noclear %I $TERM"
+  cat "Re-look at script for more information"
+  sleep 5s
   vim /etc/systemd/system/getty.target.wants/getty@tty1.service
+
+  return $SUCCESS
 }
 
 install_powertop () {
   # Installing powertop
   pacman -S powertop --noconfirm
+
+  return $SUCCESS
 }
 
 main () {
@@ -287,21 +304,21 @@ main "${@}"
 
 title "Update configs"
 
-cat >> /etc/pacman.conf << "EOL"
+cat >> /etc/pacman.conf << "EOF"
 [archlinuxfr]
 SigLevel = Never
 Server = http://repo.archlinux.fr/$arch
-EOL
+EOF
 pacman -Syy
 
-cat >> /etc/bash.bashrc << "EOL"
+cat >> /etc/bash.bashrc << "EOF"
 
 if [ -z "$DISPLAY" ] && [ -n "$XDG_VTNR" ] && [ "$XDG_VTNR" -eq 1 ]; then
   startx
 fi
-EOL
+EOF
 
-cat > /etc/systemd/system/powertop.service << EOL
+cat > /etc/systemd/system/powertop.service << "EOF"
 [Unit]
 Description=Powertop tunings
 
@@ -311,7 +328,7 @@ ExecStart=/usr/bin/powertop --auto-tune
 
 [Install]
 WantedBy=multi-user.target
-EOL
+EOF
 systemctl enable powertop.service
 
 # Add Macspoof Config
