@@ -199,18 +199,17 @@ install_graphics_audio_and_others () {
   title "Installing graphics/audio and other software that I use regularly"
   #install stuff like graphics (Intel integrated graphics)
   pacman -S xf86-input-synaptics --noconfirm
-  pacman -S xorg xorg-xbacklight --noconfirm
+  pacman -S wayland wayland-docs wayland-protocols --noconfirm
   pacman -S lib32-mesa-libgl --noconfirm
   pacman -S firefox --noconfirm
   pacman -S libreoffice --noconfirm
   pacman -S bleachbit --noconfirm
   pacman -S yaourt --noconfirm
   pacman -S evince --noconfirm
-  pacman -S alsa pulseaudio pulseaudio-alsa volumeicon --noconfirm
+  pacman -S alsa pulseaudio pulseaudio-alsa --noconfirm
   pacman -S playerctl --noconfirm
   pacman -S nautilus --noconfirm
   pacman -S gnome-screenshot --noconfirm
-  pacman -S nitrogen --noconfirm
   pacman -S xcompmgr --noconfirm
 
   return $SUCCESS
@@ -226,7 +225,7 @@ install_java () {
 install_networking () {
   title "Network Package Installation"
   pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog net-tools --noconfirm
-  pacman -S network-manager-applet nm-connection-editor --noconfirm
+  pacman -S nm-connection-editor --noconfirm
   systemctl enable NetworkManager.service
   pacman -S tor --noconfirm
   pacman -S proxychains-ng --noconfirm
@@ -247,10 +246,10 @@ install_virtul_soft () {
 install_de () {
   title "Installing Desktop Environment"
   # Install desktop environment
-  pacman -S i3 xorg-xinit --noconfirm
+  pacman -S sway i3-gaps --noconfirm
 
-  # Add exec i3 to file and comment out exec xterm
-  sed -i 's/#exec xterm -geometry 80x66+0+0 -name login/exec i3/g' /etc/X11/xinit/xinitrc
+  # Add sway to file and comment out exec xterm
+  # sed -i 's/exec xterm -geometry 80x66+0+0 -name login/sway/g' /etc/X11/xinit/xinitrc
   cat "Replace ExecStart=... with ExecStart=-/usr/bin/agetty --autologin <username> --noclear %I $TERM"
   cat "Re-look at script for more information"
   sleep 5s
@@ -313,8 +312,8 @@ pacman -Syy
 
 cat >> /etc/bash.bashrc << "EOF"
 
-if [ -z "$DISPLAY" ] && [ -n "$XDG_VTNR" ] && [ "$XDG_VTNR" -eq 1 ]; then
-  startx
+if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
+  XKB_DEFAULT_LAYOUT=us exec sway
 fi
 EOF
 

@@ -50,39 +50,17 @@ bindsym $mod+d exec dmenu_run
 # installed.
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
-# start atom text editor
-bindsym $mod+c exec atom
-
-# start firefox
-bindsym $mod+Shift+f exec firefox
-
-# start networkmanager gui
-bindsym $mod+n exec nm-connection-editor
-
-# open up folder nautilus
-bindsym $mod+z exec nautilus
-
-# Screen Shots
-bindsym Control+Print exec gnome-screenshot -i
-
-# Auto start commands
-# exec --no-startup-id pulseaudio --start
-# exec --no-startup-id start-pulseaudio-x11
-exec --no-startup-id nm-applet --sm-disable # networkmanager applet
-exec --no-startup-id volumeicon
-exec --no-startup-id nitrogen --restore
-
 # compositing manager
 exec xcompmgr -c -f -n
 
 # Pulse Audio controls
-bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 0 +5% #increase sound volume
-bindsym XF86AudioLowerVolume exec pactl set-sink-volume 0 -5% #decrease sound volume
-bindsym XF86AudioMute exec pactl set-sink-mute 0 toggle # mute sound
+bindsym XF86AudioRaiseVolume exec pactl set-sink-volume $(pacmd list-sinks |awk '/* index:/{print $3}') +5% #increase sound volume
+bindsym XF86AudioLowerVolume exec pactl set-sink-volume $(pacmd list-sinks |awk '/* index:/{print $3}') -5% #decrease sound volume
+bindsym XF86AudioMute exec pactl set-sink-mute $(pacmd list-sinks |awk '/* index:/{print $3}') toggle # mute sound
 
-# Sreen brightness controls
-bindsym XF86MonBrightnessUp exec xbacklight -inc 10 # increase screen brightness
-bindsym XF86MonBrightnessDown exec xbacklight -dec 10 # decrease screen brightness
+# BrightNess
+bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
+bindsym XF86MonBrightnessUp exec brightnessctl set +5%
 
 # Media player controls
 bindsym XF86AudioPlay exec playerctl play
@@ -179,18 +157,9 @@ bindsym $mod+Shift+0 move container to workspace $ws10
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
-# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindsym $mod+Shift+r restart
-# exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
-# Shutdown, reboot, lock screen
-set $Locker i3lock && sleep 1
-
-set $mode_system System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
+set $mode_system System (s) suspend, (h) hibernate, (r) reboot, (z) shutdown
 mode "$mode_system" {
-  bindsym l exec --no-startup-id $Locker, mode "default"
-  bindsym e exec --no-startup-id i3-msg exit, mode "default"
   bindsym s exec --no-startup-id $Locker && systemctl suspend, mode "default"
   bindsym h exec --no-startup-id $Locker && systemctl hibernate, mode "default"
   bindsym r exec --no-startup-id systemctl reboot, mode "default"
@@ -230,16 +199,28 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-# Start i3bar to display a workspace bar (plus the system information i3status
+# Start polybar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-  tray_output primary
-  status_command i3status
   position top
+  tray_output primary
+  #swaybar_command waybar
 }
 
-# Auto start of different workspaces
-# workspace $ws2 exec --no-startup-id atom
+# start atom text editor
+bindsym $mod+c exec atom
+
+# start firefox
+bindsym $mod+Shift+f exec firefox
+
+# start networkmanager gui
+bindsym $mod+n exec nm-connection-editor
+
+# open up folder nautilus
+bindsym $mod+z exec nautilus
+
+# Screen Shots
+bindsym Control+Print exec gnome-screenshot -i
 
 set $mode_gaps Gaps: (o)uter, (i)nner, (h)orizontal, (v)ertical, (t)op, (r)ight, (b)ottom, (l)eft
 set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
@@ -361,3 +342,5 @@ mode "$mode_gaps_left" {
   bindsym Return mode "$mode_gaps"
   bindsym Escape mode "default"
 }
+
+output "*" background /home/vince/Pictures/neon.jpg fill
