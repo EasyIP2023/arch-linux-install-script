@@ -16,16 +16,6 @@ arch-chroot /mnt
 pacman -S vim --noconfirm
 pacman -S wget git --noconfirm
 
-
-# This is during install process
-vim /boot/syslinux/syslinux.cfg
-DEFAULT arch
-Label arch
-  LINUX ../vmlinuz-linux
-  APPEND cryptdevice=/dev/sda2:root root=/dev/mapper/root rw ipv6.disable=1
-  INITRD ../initramfs-linux.img
-EOF
-
 # Replace ExecStart=... with ExecStart=-/usr/bin/agetty --autologin <username> --noclear %I $TERM
 
 umount -Rv /mnt

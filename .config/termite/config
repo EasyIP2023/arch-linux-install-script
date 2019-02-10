@@ -59,20 +59,20 @@ highlight = #2f2f2f
 foreground = #00ffff
 cursorColor = #00ffff
 
-color0 = #251819
+color0 = #00cc00
 color8 = #80abe6
 color1 = #ff0000
 color9 = #ff0000
-color2 = #453031
+color2 = #00ff00
 color10 = #00ff00
-color3 = #614547
+color3 = #ffff00
 color11 = #ffff00
-color4 = #856062
+color4 = #0044ff
 color12 = #0044ff
 color5 = #a88385
 color13 = #52a253
-color6 = #66ffff
-color14 = #6ace6c
+color6 = #00ff00
+color14 = #00ff00
 color7 = #66ffff
 color15 = #d376d3
 

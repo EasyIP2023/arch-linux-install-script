@@ -188,8 +188,14 @@ install_bootloader () {
   title "Installing Bootloader"
   pacman -S gptfdisk syslinux --noconfirm
   syslinux-install_update -iam
-  vim /boot/syslinux/syslinux.cfg
-  vim /etc/mkinitcpio.conf
+  # Updated syslinux config
+  echo "" > /boot/syslinux/syslinux.cfg
+  echo "DEFAULT arch" >> /boot/syslinux/syslinux.cfg
+  echo "Label arch" >> /boot/syslinux/syslinux.cfg
+  echo "  LINUX ../vmlinuz-linux" >> /boot/syslinux/syslinux.cfg
+  echo "  APPEND cryptdevice=/dev/sda2:r00t root=/dev/mapper/r00t rw ipv6.disable=1" >> /boot/syslinux/syslinux.cfg
+  echo "  INITRD ../initramfs-linux.img" >> /boot/syslinux/syslinux.cfg
+  sed -i 's/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/HOOKS=(base udev autodetect modconf block encrypt filesystems keyboard fsck)/g'
   pacman -S f2fs-tools btrfs-progs --noconfirm
   mkinitcpio -p linux
 
@@ -268,8 +274,6 @@ install_de () {
   # Install desktop environment
   pacman -S sway i3-gaps i3blocks --noconfirm
 
-  # Add sway to file and comment out exec xterm
-  # sed -i 's/exec xterm -geometry 80x66+0+0 -name login/sway/g' /etc/X11/xinit/xinitrc
   cat "Replace ExecStart=... with ExecStart=-/usr/bin/agetty --autologin <username> --noclear %I $TERM"
   cat "Re-look at script for more information"
   sleep 5s
