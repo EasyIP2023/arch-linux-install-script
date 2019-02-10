@@ -148,7 +148,7 @@ zoneinfo_hostname () {
   export LANG=en_US.UTF-8
 
   #Change Time
-  ln -s /usr/share/zoneinfo/US/Central > /etc/localtime
+  ln -sv /usr/share/zoneinfo/US/Central /etc/localtime
   hwclock --systohc --utc
 
   sleep_clear 1
