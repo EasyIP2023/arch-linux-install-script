@@ -258,7 +258,7 @@ install_ufw_rules () {
   ufw allow out 8080,9050,9898/tcp
   cp -v before.rules /etc/ufw/
 
-  ufw enable
+  systemctl enable ufw.service
   return $SUCCESS
 }
 
