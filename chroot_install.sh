@@ -17,6 +17,7 @@ REDB="`tput bold; tput setaf 1`"
 YELLOW="`tput setaf 3`"
 YELLOWB="`tput bold ; tput setaf 3`"
 BLINK="`tput blink`"
+NORMAL_USER=""
 
 wprintf() {
   fmt="${1}"
@@ -161,7 +162,7 @@ install_blackarch () {
   title "Installing Blackarch"
   #Installing Blackarch linux Tools
   wget -O strap.sh http://blackarch.org/strap.sh
-  chmod 777 strap.sh
+  chmod +x strap.sh
   ./strap.sh
   shred -n 30 -uvz strap.sh
 
@@ -173,7 +174,7 @@ user_creation () {
   passwd
 
   wprintf "Enter Normal User username: "
-  read NORMAL_USER
+  read $NORMAL_USER
   useradd -m -g users -G wheel,games,power,optical,storage,scanner,lp,audio,video -s /bin/bash "${NORMAL_USER}"
   passwd "${NORMAL_USER}"
 
@@ -206,10 +207,13 @@ install_graphics_audio_and_others () {
   pacman -S bleachbit --noconfirm
   pacman -S yaourt --noconfirm
   pacman -S evince --noconfirm
-  pacman -S alsa pulseaudio pulseaudio-alsa --noconfirm
+  pacman -S alsa alsa-utils pulseaudio pulseaudio-alsa --noconfirm
   pacman -S playerctl --noconfirm
   pacman -S nautilus --noconfirm
   pacman -S gnome-screenshot --noconfirm
+  pacman -S atom --noconfirm
+  pacman -S mlocate --noconfirm
+  pacman -S termite --noconfirm
   pacman -S xcompmgr --noconfirm
 
   return $SUCCESS
@@ -225,14 +229,30 @@ install_java () {
 install_networking () {
   title "Network Package Installation"
   pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog net-tools --noconfirm
-  pacman -S nm-connection-editor --noconfirm
+  pacman -S nm-connection-editor iw --noconfirm
   systemctl enable NetworkManager.service
   pacman -S tor --noconfirm
   pacman -S proxychains-ng --noconfirm
   pacman -S macchanger --noconfirm
+  pacman -S openssh
+
   # FireWall
   pacman -S ufw --noconfirm
 
+  return $SUCCESS
+}
+
+install_ufw_rules () {
+  title "Creating Ufw rules"
+
+  ufw default deny outgoing
+  ufw default deny incoming
+  ufw allow out 53/udp
+  ufw allow out 22,24,53,80,443/tcp
+  ufw allow out 8080,9050,9898/tcp
+  cp -v before.rules /etc/ufw/
+
+  ufw enable
   return $SUCCESS
 }
 
@@ -246,7 +266,7 @@ install_virtul_soft () {
 install_de () {
   title "Installing Desktop Environment"
   # Install desktop environment
-  pacman -S sway i3-gaps --noconfirm
+  pacman -S sway i3-gaps i3blocks --noconfirm
 
   # Add sway to file and comment out exec xterm
   # sed -i 's/exec xterm -geometry 80x66+0+0 -name login/sway/g' /etc/X11/xinit/xinitrc
@@ -258,9 +278,33 @@ install_de () {
   return $SUCCESS
 }
 
-install_powertop () {
+install_power () {
+  title "Installing power packages"
   # Installing powertop
   pacman -S powertop --noconfirm
+  pacman -S acpi --noconfirm
+
+  return $SUCCESS
+}
+
+copy_configs () {
+  title "Update Configs"
+
+  mv -v .config /home/"${NORMAL_USER}"
+  mv -v .bash_profile /home/"${NORMAL_USER}"
+  mv -v .bashrc /home/"${NORMAL_USER}"
+  mv -v .local /home/"${NORMAL_USER}"
+
+  mkdir -v /home/"${NORMAL_USER}"/Pictures
+  mv -v neon.jg /home/"${NORMAL_USER}"/Pictures
+
+  chown -Rv "${NORMAL_USER}":users /home/"${NORMAL_USER}"/.config
+  chown -Rv "${NORMAL_USER}":users /home/"${NORMAL_USER}"/.local
+  chown -v "${NORMAL_USER}":users /home/"${NORMAL_USER}"/.bashrc
+  chown -v "${NORMAL_USER}":users /home/"${NORMAL_USER}"/.bash_profile
+  chown -v "${NORMAL_USER}":users /home/"${NORMAL_USER}"/Pictures/neon.jpg
+
+  fc-cache -fv
 
   return $SUCCESS
 }
@@ -290,18 +334,24 @@ main () {
   install_networking
   sleep_clear 1
 
+  install_ufw_rules
+  sleep_clear 1
+
   install_virtul_soft
   sleep_clear 1
 
   install_de
   sleep_clear 1
 
+  install_power
+  sleep_clear 1
+
+  copy_configs
+
   return $SUCCESS
 }
 
 main "${@}"
-
-title "Update configs"
 
 cat >> /etc/pacman.conf << "EOF"
 [archlinuxfr]
@@ -367,14 +417,11 @@ printf "Enter ethernet address(xx:xx:xx:xx:xx:xx): "
 read ETHER
 printf "Enter wireless address(xx:xx:xx:xx:xx:xx): "
 read WLAN
-cat > /etc/udev/rules.d/10-network.rules << "EOF"
-SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${ETHER}", NAME="eth0"
-SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="${WLAN}", NAME="wlan0"
-EOF
+echo "SUBSYSTEM==\"net\", ACTION==\"add\", ATTR{address}==\"${ETHER}\", NAME=\"eth0\"" >> /etc/udev/rules.d/10-network.rules
+echo "SUBSYSTEM==\"net\", ACTION==\"add\", ATTR{address}==\"${WLAN}\", NAME=\"wlan0\"" >> /etc/udev/rules.d/10-network.rules
 
-cp -v i3_config /home/vince/.config/i3/config
-cp -v .bashrc /home/vince/.bashrc
-chown -v vince:users /home/vince/.config/i3/config
-chown -v vince:users /home/vince/.bashrc
+# This is for mlocate
+updatedb
 
-printf "Installation Complete"
+sleep_clear 1
+title "Installation Complete"
