@@ -195,7 +195,7 @@ install_bootloader () {
   echo "  LINUX ../vmlinuz-linux" >> /boot/syslinux/syslinux.cfg
   echo "  APPEND cryptdevice=/dev/sda2:r00t root=/dev/mapper/r00t rw ipv6.disable=1" >> /boot/syslinux/syslinux.cfg
   echo "  INITRD ../initramfs-linux.img" >> /boot/syslinux/syslinux.cfg
-  sed -i 's/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/HOOKS=(base udev autodetect modconf block encrypt filesystems keyboard fsck)/g'
+  sed -i 's/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/HOOKS=(base udev autodetect modconf block encrypt filesystems keyboard fsck)/g' /etc/mkinitcpio.conf 
   pacman -S f2fs-tools btrfs-progs --noconfirm
   mkinitcpio -p linux
 
