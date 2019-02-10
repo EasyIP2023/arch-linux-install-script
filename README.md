@@ -1,6 +1,6 @@
 # Arch Linux Install Script
 
-If using, after install when b#00ff00ooting up let it finishes fixing stuff. She works :)!
+If using, after install when booting up let it finishes fixing stuff. She works :)!
 
 ```
 git clone htttps://github.com:EasyIP2023/arch-linux-install-script.git
