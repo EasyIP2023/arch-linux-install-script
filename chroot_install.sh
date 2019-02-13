@@ -204,9 +204,8 @@ install_bootloader () {
 
 install_graphics_audio_and_others () {
   title "Installing graphics/audio and other software that I use regularly"
-  #install stuff like graphics (Intel integrated graphics)
-  pacman -S xf86-input-synaptics --noconfirm
-  pacman -S wayland wayland-docs wayland-protocols --noconfirm
+
+  pacman -S wayland wayland-docs wayland-protocols libinput --noconfirm
   pacman -S lib32-mesa-libgl --noconfirm
   pacman -S firefox --noconfirm
   pacman -S libreoffice --noconfirm
@@ -303,10 +302,10 @@ copy_configs () {
   mv -v neon.jg /home/"${NORMAL_USER}"/Pictures
 
   chown -Rv "${NORMAL_USER}":users /home/"${NORMAL_USER}"/.config
+  chown -Rv "${NORMAL_USER}":users /home/"${NORMAL_USER}"/Pictures
   chown -Rv "${NORMAL_USER}":users /home/"${NORMAL_USER}"/.local
   chown -v "${NORMAL_USER}":users /home/"${NORMAL_USER}"/.bashrc
   chown -v "${NORMAL_USER}":users /home/"${NORMAL_USER}"/.bash_profile
-  chown -v "${NORMAL_USER}":users /home/"${NORMAL_USER}"/Pictures/neon.jpg
 
   fc-cache -fv
 
