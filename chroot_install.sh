@@ -171,7 +171,8 @@ install_blackarch () {
 
 user_creation () {
   title "User Creation"
-  wprintf "Enter root user password: "
+
+  wprintf "Enter root user password: \n"
   passwd
 
   wprintf "Enter Normal User username: "
@@ -180,7 +181,6 @@ user_creation () {
   passwd $NORMAL_USER
 
   EDITOR=vim visudo
-  pacman -S bash-completion --noconfrim
 
   return $SUCCESS
 }
@@ -208,7 +208,6 @@ install_graphics_audio_and_others () {
 
   pacman -S wayland wayland-docs wayland-protocols libinput --noconfirm
   pacman -S lib32-mesa-libgl --noconfirm
-  pacman -S firefox --noconfirm
   pacman -S libreoffice --noconfirm
   pacman -S bleachbit --noconfirm
   pacman -S yaourt --noconfirm
@@ -223,6 +222,8 @@ install_graphics_audio_and_others () {
   # To take screenshot in a wayland compositor
   pacman -S grim --noconfirm
   pacman -S slurp --noconfirm
+
+  pacman -S bash-completion --noconfirm
 
   return $SUCCESS
 }
@@ -242,7 +243,7 @@ install_networking () {
   pacman -S tor --noconfirm
   pacman -S proxychains-ng --noconfirm
   pacman -S macchanger --noconfirm
-  pacman -S openssh
+  pacman -S openssh --noconfirm
 
   # FireWall
   pacman -S ufw --noconfirm
@@ -276,10 +277,10 @@ install_de () {
   # Install desktop environment
   pacman -S sway i3-gaps i3blocks --noconfirm
 
-  cat "Replace ExecStart=... with ExecStart=-/usr/bin/agetty --autologin <username> --noclear %I $TERM"
-  cat "Re-look at script for more information"
-  sleep 5s
-  vim /etc/systemd/system/getty.target.wants/getty@tty1.service
+  # cat "Replace ExecStart=... with ExecStart=-/usr/bin/agetty --autologin <username> --noclear %I $TERM"
+  # cat "Re-look at script for more information"
+  # sleep 5s
+  # vim /etc/systemd/system/getty.target.wants/getty@tty1.service
 
   return $SUCCESS
 }
@@ -289,6 +290,25 @@ install_power () {
   # Installing powertop
   pacman -S powertop --noconfirm
   pacman -S acpi --noconfirm
+
+  return $SUCCESS
+}
+
+install_yay () {
+  title "Installing yay"
+
+  git clone https://aur.archlinux.org/yay.git
+  cd yay/
+  makepkg -si
+  cd ..
+
+  return $SUCCESS
+}
+
+install_google_chrome () {
+  title "Installing Google Chrome"
+
+  yay -S google-chrome
 
   return $SUCCESS
 }
@@ -350,6 +370,12 @@ main () {
   sleep_clear 1
 
   install_power
+  sleep_clear 1
+
+  install_yay
+  sleep_clear 1
+
+  install_google_chrome
   sleep_clear 1
 
   copy_configs

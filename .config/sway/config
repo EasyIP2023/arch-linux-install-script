@@ -211,17 +211,14 @@ client.urgent #d33682 #d33682 #fdf6e3 #dc322f #d33682
 # start atom text editor
 bindsym $mod+c exec atom
 
-# start firefox
-bindsym $mod+Shift+f exec firefox
+# start google chrome
+bindsym $mod+Shift+f exec google-chrome-stable
 
 # start networkmanager gui
 bindsym $mod+n exec nm-connection-editor
 
 # open up folder nautilus
 bindsym $mod+z exec nautilus
-
-# Screen Shots
-bindsym Control+Print exec flameshot gui -p ~/Pictures/captures
 
 set $mode_gaps Gaps: (o)uter, (i)nner, (h)orizontal, (v)ertical, (t)op, (r)ight, (b)ottom, (l)eft
 set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
@@ -259,6 +256,7 @@ mode "$mode_gaps_outer" {
   bindsym Return mode "$mode_gaps"
   bindsym Escape mode "default"
 }
+
 mode "$mode_gaps_inner" {
   bindsym plus  gaps inner current plus 5
   bindsym minus gaps inner current minus 5
@@ -271,6 +269,7 @@ mode "$mode_gaps_inner" {
   bindsym Return mode "$mode_gaps"
   bindsym Escape mode "default"
 }
+
 mode "$mode_gaps_horiz" {
   bindsym plus  gaps horizontal current plus 5
   bindsym minus gaps horizontal current minus 5
@@ -283,6 +282,7 @@ mode "$mode_gaps_horiz" {
   bindsym Return mode "$mode_gaps"
   bindsym Escape mode "default"
 }
+
 mode "$mode_gaps_verti" {
   bindsym plus  gaps vertical current plus 5
   bindsym minus gaps vertical current minus 5
@@ -295,6 +295,7 @@ mode "$mode_gaps_verti" {
   bindsym Return mode "$mode_gaps"
   bindsym Escape mode "default"
 }
+
 mode "$mode_gaps_top" {
   bindsym plus  gaps top current plus 5
   bindsym minus gaps top current minus 5
@@ -307,6 +308,7 @@ mode "$mode_gaps_top" {
   bindsym Return mode "$mode_gaps"
   bindsym Escape mode "default"
 }
+
 mode "$mode_gaps_right" {
   bindsym plus  gaps right current plus 5
   bindsym minus gaps right current minus 5
@@ -319,6 +321,7 @@ mode "$mode_gaps_right" {
   bindsym Return mode "$mode_gaps"
   bindsym Escape mode "default"
 }
+
 mode "$mode_gaps_bottom" {
   bindsym plus  gaps bottom current plus 5
   bindsym minus gaps bottom current minus 5
@@ -331,6 +334,7 @@ mode "$mode_gaps_bottom" {
   bindsym Return mode "$mode_gaps"
   bindsym Escape mode "default"
 }
+
 mode "$mode_gaps_left" {
   bindsym plus  gaps left current plus 5
   bindsym minus gaps left current minus 5
