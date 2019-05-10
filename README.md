@@ -24,7 +24,7 @@ pacstrap -i /mnt base base-devel
 genfstab -U -p /mnt >> /mnt/etc/fstab
 arch-chroot /mnt
 pacman -S vim --noconfirm
-pacman -S wget git --noconfirm
+pacman -S wget git curl --noconfirm
 ```
 
 **After arch-chroot**

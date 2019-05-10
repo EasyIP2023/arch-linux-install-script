@@ -161,7 +161,7 @@ zoneinfo_hostname () {
 install_blackarch () {
   title "Installing Blackarch"
   #Installing Blackarch linux Tools
-  wget -O strap.sh http://blackarch.org/strap.sh
+  curl -O https://blackarch.org/strap.sh
   chmod +x strap.sh
   ./strap.sh
   shred -n 30 -uvz strap.sh
@@ -259,9 +259,10 @@ install_ufw_rules () {
   ufw allow out 53/udp
   ufw allow out 22,24,53,80,443/tcp
   ufw allow out 8080,9050,9898/tcp
-  cp -v before.rules /etc/ufw/
+  mv -v before.rules /etc/ufw/
 
   systemctl enable ufw.service
+
   return $SUCCESS
 }
 
@@ -337,46 +338,46 @@ copy_configs () {
 
 main () {
   update_pacman
-  sleep_clear 1
+  sleep_clear 2
 
   zoneinfo_hostname
-  sleep_clear 1
+  sleep_clear 2
 
   install_blackarch
-  sleep_clear 1
+  sleep_clear 2
 
   user_creation
-  sleep_clear 1
+  sleep_clear 2
 
   install_bootloader
-  sleep_clear 1
+  sleep_clear 2
 
   install_graphics_audio_and_others
-  sleep_clear 1
+  sleep_clear 2
 
   install_java
-  sleep_clear 1
+  sleep_clear 2
 
   install_networking
-  sleep_clear 1
-
-  install_ufw_rules
-  sleep_clear 1
+  sleep_clear 2
 
   install_virtul_soft
-  sleep_clear 1
+  sleep_clear 2
 
   install_de
-  sleep_clear 1
+  sleep_clear 2
 
   install_power
-  sleep_clear 1
+  sleep_clear 2
 
   install_yay
-  sleep_clear 1
+  sleep_clear 2
 
   install_google_chrome
-  sleep_clear 1
+  sleep_clear 2
+
+  install_ufw_rules
+  sleep_clear 2
 
   copy_configs
 
