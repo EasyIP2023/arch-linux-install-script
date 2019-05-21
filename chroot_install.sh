@@ -148,7 +148,7 @@ zoneinfo_hostname () {
   export LANG=en_US.UTF-8
 
   #Change Time
-  ln -sv /usr/share/zoneinfo/US/Central /etc/localtime
+  ln -sfv /usr/share/zoneinfo/US/Central /etc/localtime
   hwclock --systohc --utc
 
   sleep_clear 1
@@ -171,12 +171,13 @@ install_blackarch () {
 
 user_creation () {
   title "User Creation"
+  wprintf "Enter root user password: "
   passwd
 
   wprintf "Enter Normal User username: "
-  read $NORMAL_USER
-  useradd -m -g users -G wheel,games,power,optical,storage,scanner,lp,audio,video -s /bin/bash "${NORMAL_USER}"
-  passwd "${NORMAL_USER}"
+  read NORMAL_USER
+  useradd -m -g users -G wheel,games,power,optical,storage,scanner,lp,audio,video -s /bin/bash $NORMAL_USER
+  passwd $NORMAL_USER
 
   EDITOR=vim visudo
   pacman -S bash-completion --noconfrim
@@ -295,19 +296,19 @@ install_power () {
 copy_configs () {
   title "Update Configs"
 
-  mv -v .config /home/"${NORMAL_USER}"
-  mv -v .bash_profile /home/"${NORMAL_USER}"
-  mv -v .bashrc /home/"${NORMAL_USER}"
-  mv -v .local /home/"${NORMAL_USER}"
+  mv -v .config /home/$NORMAL_USER
+  mv -v .bash_profile /home/$NORMAL_USER
+  mv -v .bashrc /home/$NORMAL_USER
+  mv -v .local /home/$NORMAL_USER
 
-  mkdir -v /home/"${NORMAL_USER}"/Pictures
-  mv -v pics/attack-on-titan.png /home/"${NORMAL_USER}"/Pictures
+  mkdir -v /home/$NORMAL_USER/Pictures
+  mv -v pics/attack-on-titan.png /home/$NORMAL_USER/Pictures
 
-  chown -Rv "${NORMAL_USER}":users /home/"${NORMAL_USER}"/.config
-  chown -Rv "${NORMAL_USER}":users /home/"${NORMAL_USER}"/Pictures
-  chown -Rv "${NORMAL_USER}":users /home/"${NORMAL_USER}"/.local
-  chown -v "${NORMAL_USER}":users /home/"${NORMAL_USER}"/.bashrc
-  chown -v "${NORMAL_USER}":users /home/"${NORMAL_USER}"/.bash_profile
+  chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/.config
+  chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/Pictures
+  chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/.local
+  chown -v $NORMAL_USER:users /home/$NORMAL_USER/.bashrc
+  chown -v $NORMAL_USER:users /home/$NORMAL_USER/.bash_profile
 
   fc-cache -fv
 
