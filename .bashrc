@@ -59,8 +59,10 @@ if [ $UID -ne 0 ]; then
   alias kern-clean='make -C /lib/modules/$(uname -r)/build M=$PWD clean'
   alias devices='cat /proc/devices'
 fi
+alias man_perlpod='man perlpod'
 
-export VULKAN_SDK=/home/vince/Downloads/1.1.106.0/x86_64
+export VULKAN_SDK=/home/vince/Downloads/1.1.114.0/x86_64
 export PATH=$VULKAN_SDK/bin:$PATH
 export LD_LIBRARY_PATH=$VULKAN_SDK/lib:$LD_LIBRARY_PATH
-export VK_LAYER_PATH=$VULKAN_SDK/etc/explicit_layer.d
+export VK_LAYER_PATH=$VULKAN_SDK/etc/vulkan/explicit_layer.d
+export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
