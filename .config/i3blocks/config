@@ -2,7 +2,7 @@ separator_block_width=14
 
 [disk-root]
 label=:
-command=/usr/lib/i3blocks/disk /
+command=df -h | grep /dev/mapper
 interval=30
 color=#1793D1
 
