@@ -188,6 +188,7 @@ user_creation () {
 install_bootloader () {
   title "Installing Bootloader"
   pacman -S gptfdisk syslinux --noconfirm
+	pacman -S linux linux-firmware mkinitcpio --noconfirm
   syslinux-install_update -iam
   # Updated syslinux config
   echo "" > /boot/syslinux/syslinux.cfg
@@ -208,14 +209,11 @@ install_graphics_audio_and_others () {
 
   pacman -S wayland wayland-docs wayland-protocols libinput --noconfirm
   pacman -S lib32-mesa-libgl --noconfirm
-  pacman -S libreoffice --noconfirm
   pacman -S bleachbit --noconfirm
-  pacman -S yaourt --noconfirm
   pacman -S evince --noconfirm
   pacman -S alsa alsa-utils pulseaudio pulseaudio-alsa --noconfirm
   pacman -S playerctl --noconfirm
   pacman -S nautilus --noconfirm
-  pacman -S atom --noconfirm
   pacman -S mlocate --noconfirm
   pacman -S termite --noconfirm
   pacman -S xcompmgr --noconfirm
@@ -306,6 +304,22 @@ install_yay () {
   return $SUCCESS
 }
 
+install_atom () {
+  title "Installing Firefox"
+	
+	pacman -S atom --noconfirm
+	
+  return $SUCCESS
+}
+
+install_firefox () {
+  title "Installing Firefox"
+	
+	pacman -S firefox --noconfirm
+	
+  return $SUCCESS
+}
+
 install_google_chrome () {
   title "Installing Google Chrome"
 
@@ -337,26 +351,34 @@ copy_configs () {
 }
 
 main () {
-  update_pacman
-  sleep_clear 2
+	update_pacman
+	sleep_clear 2
 
-  zoneinfo_hostname
-  sleep_clear 2
+	zoneinfo_hostname
+	sleep_clear 2
 
-  install_blackarch
-  sleep_clear 2
+	install_blackarch
+	sleep_clear 2
 
   user_creation
   sleep_clear 2
 
   install_bootloader
   sleep_clear 2
+	
 
   install_graphics_audio_and_others
   sleep_clear 2
+	
+	# install_atom
+	# sleep_clear 2
+	
+	# install_firefox
+  # install_google_chrome
+  # sleep_clear 2
 
-  install_java
-  sleep_clear 2
+  # install_java
+  # sleep_clear 2
 
   install_networking
   sleep_clear 2
@@ -370,16 +392,13 @@ main () {
   install_power
   sleep_clear 2
 
-  install_yay
-  sleep_clear 2
-
-  install_google_chrome
-  sleep_clear 2
+  # install_yay
+  # sleep_clear 2	
 
   install_ufw_rules
   sleep_clear 2
 
-  copy_configs
+	copy_configs
 
   return $SUCCESS
 }
