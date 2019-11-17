@@ -477,3 +477,5 @@ updatedb
 
 sleep_clear 1
 title "Installation Complete"
+sleep_clear 1
+
