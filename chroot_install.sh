@@ -267,29 +267,19 @@ install_ufw_rules () {
 install_virtul_soft () {
   title "Installing VM Software"
   pacman -S qemu qemu-arch-extra --noconfirm
-
   return $SUCCESS
 }
 
 install_de () {
   title "Installing Desktop Environment"
-  # Install desktop environment
   pacman -S sway i3-gaps i3blocks --noconfirm
-
-  # cat "Replace ExecStart=... with ExecStart=-/usr/bin/agetty --autologin <username> --noclear %I $TERM"
-  # cat "Re-look at script for more information"
-  # sleep 5s
-  # vim /etc/systemd/system/getty.target.wants/getty@tty1.service
-
   return $SUCCESS
 }
 
 install_power () {
   title "Installing power packages"
-  # Installing powertop
   pacman -S powertop --noconfirm
   pacman -S acpi --noconfirm
-
   return $SUCCESS
 }
 
@@ -305,18 +295,14 @@ install_yay () {
 }
 
 install_atom () {
-  title "Installing Firefox"
-	
-	pacman -S atom --noconfirm
-	
+  title "Installing Atom"
+  pacman -S atom --noconfirm
   return $SUCCESS
 }
 
 install_firefox () {
   title "Installing Firefox"
-	
-	pacman -S firefox --noconfirm
-	
+  pacman -S firefox --noconfirm
   return $SUCCESS
 }
 
@@ -338,6 +324,7 @@ copy_configs () {
 
   mkdir -v /home/$NORMAL_USER/Pictures
   mv -v pics/attack-on-titan.png /home/$NORMAL_USER/Pictures
+  mv -v pics/chill.jpg /home/$NORMAL_USER/Pictures
 
   chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/.config
   chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/Pictures
@@ -365,17 +352,16 @@ main () {
 
   install_bootloader
   sleep_clear 2
-	
 
   install_graphics_audio_and_others
   sleep_clear 2
-	
+
 	# install_atom
 	# sleep_clear 2
-	
-	# install_firefox
+
   # install_google_chrome
-  # sleep_clear 2
+	install_firefox
+  sleep_clear 2
 
   # install_java
   # sleep_clear 2
@@ -393,7 +379,7 @@ main () {
   sleep_clear 2
 
   # install_yay
-  # sleep_clear 2	
+  # sleep_clear 2
 
   install_ufw_rules
   sleep_clear 2
@@ -413,7 +399,6 @@ EOF
 pacman -Syy
 
 cat >> /etc/bash.bashrc << "EOF"
-
 if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
   XKB_DEFAULT_LAYOUT=us exec sway
 fi
@@ -477,5 +462,4 @@ updatedb
 
 sleep_clear 1
 title "Installation Complete"
-sleep_clear 1
-
+sleep_clear 2

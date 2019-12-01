@@ -35,7 +35,3 @@ vim /mnt/etc/systemd/system/getty.target.wants/getty@tty1.service
 umount -Rv /mnt
 cryptsetup close r00t
 ```
-
-# What It looks like
-![screen term](https://github.com/EasyIP2023/arch-linux-install-script/blob/master/pics/window_screen.png)
-![firefox](https://github.com/EasyIP2023/arch-linux-install-script/blob/master/pics/window_term_fire.png)

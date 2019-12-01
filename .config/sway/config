@@ -208,11 +208,14 @@ client.focused_inactive #073642 #073642 #eee8d5 #6c71c4 #073642
 client.unfocused #073642 #073642 #93a1a1 #586e75 #073642
 client.urgent #d33682 #d33682 #fdf6e3 #dc322f #d33682
 
+# start keepassx
+bindsym $mod+p exec keepassx
+
 # start atom text editor
 bindsym $mod+c exec atom
 
-# start google chrome
-bindsym $mod+Shift+f exec google-chrome-stable
+# start firefox
+bindsym $mod+Shift+f exec firefox
 
 # start networkmanager gui
 bindsym $mod+n exec nm-connection-editor
@@ -348,4 +351,4 @@ mode "$mode_gaps_left" {
   bindsym Escape mode "default"
 }
 
-output "*" background /home/vince/Pictures/attack-on-titan.png fill
+output "*" background /home/vince/Pictures/chill.jpg fill
