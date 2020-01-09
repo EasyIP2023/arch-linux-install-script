@@ -9,8 +9,9 @@ PS1='\[\e[1;91m\]\u@\h: \[\e[33m\]\W \[\e[32m\]\$ \[\033[0m\]'
 alias ls='ls --color=auto'
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+#export PATH=$PATH:$HOME/.rvm/src/ruby-2.6.0/bin
+export PATH=$PATH:$HOME/.rvm/rubies/ruby-2.6.0/bin
 
 NORMAL=`echo -e '\033[0m'`
 RED=`echo -e '\e[1;91m'`
@@ -45,7 +46,7 @@ alias vi=vim
 alias convert_to_haml="find . -name \*.erb -print | sed 'p;s/.erb$/.haml/' | xargs -n2 html2haml"
 if [ $UID -ne 0 ]; then
   alias reboot='sudo reboot'
-  alias update='sudo pacman -Syyu'
+  alias update='sudo pacman -Syyu &&6 yay -Sc'
   alias svim='sudo vim'
   alias apache_start='sudo systemctl start httpd.service'
   alias apache_stop='sudo systemctl stop httpd.service'
@@ -61,8 +62,14 @@ if [ $UID -ne 0 ]; then
 fi
 alias man_perlpod='man perlpod'
 
-export VULKAN_SDK=/home/vince/Downloads/1.1.114.0/x86_64
+export VULKAN_SDK=$HOME/Downloads/1.1.130.0/x86_64
 export PATH=$VULKAN_SDK/bin:$PATH
 export LD_LIBRARY_PATH=$VULKAN_SDK/lib:$LD_LIBRARY_PATH
 export VK_LAYER_PATH=$VULKAN_SDK/etc/vulkan/explicit_layer.d
-export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
+export SDL_VIDEODRIVER=wayland
+
+alias luc_install='sudo ninja install -C $HOME/git/lucurious/ibuild'
+alias luc_uninstall='sudo ninja uninstall -C $HOME/git/lucurious/ibuild'
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
