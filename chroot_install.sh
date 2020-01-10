@@ -188,14 +188,14 @@ user_creation () {
 install_bootloader () {
   title "Installing Bootloader"
   pacman -S gptfdisk syslinux --noconfirm
-	pacman -S linux linux-firmware mkinitcpio --noconfirm
+  pacman -S linux linux-firmware mkinitcpio --noconfirm
   syslinux-install_update -iam
   # Updated syslinux config
   echo "" > /boot/syslinux/syslinux.cfg
   echo "DEFAULT arch" >> /boot/syslinux/syslinux.cfg
   echo "Label arch" >> /boot/syslinux/syslinux.cfg
   echo "  LINUX ../vmlinuz-linux" >> /boot/syslinux/syslinux.cfg
-  echo "  APPEND cryptdevice=/dev/sda2:r00t root=/dev/mapper/r00t rw ipv6.disable=1" >> /boot/syslinux/syslinux.cfg
+  echo "  APPEND cryptdevice=/dev/nvme0n1p2:r00t root=/dev/mapper/r00t rw ipv6.disable=1" >> /boot/syslinux/syslinux.cfg
   echo "  INITRD ../initramfs-linux.img" >> /boot/syslinux/syslinux.cfg
   sed -i 's/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/HOOKS=(base udev autodetect modconf block encrypt filesystems keyboard fsck)/g' /etc/mkinitcpio.conf
   pacman -S f2fs-tools btrfs-progs --noconfirm
@@ -209,7 +209,6 @@ install_graphics_audio_and_others () {
 
   pacman -S wayland wayland-docs wayland-protocols libinput --noconfirm
   pacman -S lib32-mesa-libgl --noconfirm
-  pacman -S bleachbit --noconfirm
   pacman -S evince --noconfirm
   pacman -S alsa alsa-utils pulseaudio pulseaudio-alsa --noconfirm
   pacman -S playerctl --noconfirm
@@ -338,14 +337,14 @@ copy_configs () {
 }
 
 main () {
-	update_pacman
-	sleep_clear 2
+  update_pacman
+  sleep_clear 2
 
-	zoneinfo_hostname
-	sleep_clear 2
+  zoneinfo_hostname
+  sleep_clear 2
 
-	install_blackarch
-	sleep_clear 2
+  install_blackarch
+  sleep_clear 2
 
   user_creation
   sleep_clear 2
@@ -356,11 +355,11 @@ main () {
   install_graphics_audio_and_others
   sleep_clear 2
 
-	# install_atom
-	# sleep_clear 2
+  install_atom
+  sleep_clear 2
 
   # install_google_chrome
-	install_firefox
+  install_firefox
   sleep_clear 2
 
   # install_java
@@ -384,7 +383,7 @@ main () {
   install_ufw_rules
   sleep_clear 2
 
-	copy_configs
+  copy_configs
 
   return $SUCCESS
 }
