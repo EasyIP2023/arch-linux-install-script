@@ -207,7 +207,7 @@ install_bootloader () {
 install_graphics_audio_and_others () {
   title "Installing graphics/audio and other software that I use regularly"
 
-  pacman -S wayland wayland-docs wayland-protocols libinput --noconfirm
+  pacman -S wayland wayland-protocols libinput xorg-server-xwayland --noconfirm
   pacman -S lib32-mesa-libgl --noconfirm
   pacman -S evince --noconfirm
   pacman -S alsa alsa-utils pulseaudio pulseaudio-alsa --noconfirm
