@@ -1,6 +1,6 @@
 # Arch Linux Install Script
 
-I designed this for me and only me!!! Reminder blackarch linux strap.sh will take awhile to finish running.
+**I DESIGNED THIS FOR ME AND ONLY ME**
 
 ```
 git clone htttps://github.com/EasyIP2023/arch-linux-install-script.git

@@ -8,11 +8,6 @@ PS1='\[\e[1;91m\]\u@\h: \[\e[33m\]\W \[\e[32m\]\$ \[\033[0m\]'
 
 alias ls='ls --color=auto'
 
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
-#export PATH=$PATH:$HOME/.rvm/src/ruby-2.6.0/bin
-export PATH=$PATH:$HOME/.rvm/rubies/ruby-2.6.0/bin
-
 NORMAL=`echo -e '\033[0m'`
 RED=`echo -e '\e[1;91m'`
 GREEN=`echo -e '\e[32m'`
@@ -38,7 +33,7 @@ function colored_ip(){
 }
 
 alias ifconfig='colored_ip'
-alias ls='ls --color=auto'
+alias ls='ls -l --color=auto'
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
@@ -62,14 +57,13 @@ if [ $UID -ne 0 ]; then
 fi
 alias man_perlpod='man perlpod'
 
-export VULKAN_SDK=$HOME/Downloads/1.1.130.0/x86_64
-export PATH=$VULKAN_SDK/bin:$PATH
-export LD_LIBRARY_PATH=$VULKAN_SDK/lib:$LD_LIBRARY_PATH
+export VULKAN_SDK=$HOME/storage/Downloads/1.1.130.0/x86_64
+export PATH=$PATH:$VULKAN_SDK/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$VULKAN_SDK/lib
 export VK_LAYER_PATH=$VULKAN_SDK/etc/vulkan/explicit_layer.d
 export SDL_VIDEODRIVER=wayland
 
-alias luc_install='sudo ninja install -C $HOME/git/lucurious/ibuild'
-alias luc_uninstall='sudo ninja uninstall -C $HOME/git/lucurious/ibuild'
-
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
+alias luc_install='sudo ninja install -C $HOME/storage/git/lucurious/ibuild'
+alias luc_uninstall='sudo ninja uninstall -C $HOME/storage/git/lucurious/ibuild'
+alias bat='upower -i /org/freedesktop/UPower/devices/battery_BAT0| grep -E "state|to full|percentage"'
+alias disk_mem='df -h /dev/mapper/r00t && df -h /dev/mapper/storage'

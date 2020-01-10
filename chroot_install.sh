@@ -7,7 +7,7 @@ FALSE=1
 SUCCESS=1337
 FAILURE=31337
 
-#Colors
+# Colors
 WHITE="`tput setaf 7`"
 WHITEB="`tput bold ; tput setaf 7`"
 GREEN="`tput setaf 2`"
@@ -211,6 +211,7 @@ install_graphics_audio_and_others () {
   pacman -S lib32-mesa-libgl --noconfirm
   pacman -S evince --noconfirm
   pacman -S alsa alsa-utils pulseaudio pulseaudio-alsa --noconfirm
+  pacman -S brightnessctl --noconfirm
   pacman -S playerctl --noconfirm
   pacman -S nautilus --noconfirm
   pacman -S mlocate --noconfirm
@@ -258,7 +259,7 @@ install_ufw_rules () {
   ufw allow out 8080,9050,9898/tcp
   mv -v before.rules /etc/ufw/
 
-  systemctl enable ufw.service
+  ufw enable
 
   return $SUCCESS
 }
@@ -271,7 +272,7 @@ install_virtul_soft () {
 
 install_de () {
   title "Installing Desktop Environment"
-  pacman -S sway i3-gaps i3blocks --noconfirm
+  pacman -S sway i3-gaps --noconfirm
   return $SUCCESS
 }
 
