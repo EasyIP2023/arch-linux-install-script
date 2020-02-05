@@ -41,7 +41,7 @@ alias vi=vim
 alias convert_to_haml="find . -name \*.erb -print | sed 'p;s/.erb$/.haml/' | xargs -n2 html2haml"
 if [ $UID -ne 0 ]; then
   alias reboot='sudo reboot'
-  alias update='sudo pacman -Syyu &&6 yay -Sc'
+  alias update='sudo pacman -Syyu && yay -Sc --noconfirm'
   alias svim='sudo vim'
   alias apache_start='sudo systemctl start httpd.service'
   alias apache_stop='sudo systemctl stop httpd.service'
@@ -57,15 +57,17 @@ if [ $UID -ne 0 ]; then
 fi
 alias man_perlpod='man perlpod'
 
-export VULKAN_SDK=$HOME/storage/Downloads/1.1.130.0/x86_64
-export PATH=$PATH:$VULKAN_SDK/bin
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$VULKAN_SDK/lib
-export VK_LAYER_PATH=$VULKAN_SDK/etc/vulkan/explicit_layer.d
+WB_SOS=/home/vince/storage/steam/steamapps/common/MountBlade\ Warband
+LIB_X86_STEAM_RUNTIME=/home/vince/.local/share/Steam/ubuntu12_32/steam-runtime/usr/lib/x86_64-linux-gnu
+LIB_X86_STEAM=/home/vince/.local/share/Steam/ubuntu12_32/steam-runtime/lib/x86_64-linux-gnu/
+
+export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:$WB_SOS:$LIB_X86_STEAM_RUNTIME:$LIB_X86_STEAM
 export SDL_VIDEODRIVER=wayland
 
 alias luc_install='sudo ninja install -C $HOME/storage/git/lucurious/ibuild'
 alias luc_uninstall='sudo ninja uninstall -C $HOME/storage/git/lucurious/ibuild'
 alias bat='upower -i /org/freedesktop/UPower/devices/battery_BAT0| grep -E "state|to full|percentage"'
 alias disk_mem='df -h /dev/mapper/r00t && df -h /dev/mapper/storage'
-alias open_drive='sudo cryptsetup open --verbose --type luks /dev/sda1 storage && sudo mount -v /dev/mapper/storage storage'
-alias close_drive='sudo umount -Rv storage && sudo cryptsetup --verbose close storage'
+alias open_drive='sudo cryptsetup open --verbose --type luks /dev/sda1 storage && sudo mount -v /dev/mapper/storage $HOME/storage'
+alias close_drive='sudo umount -Rv $HOME/storage && sudo cryptsetup --verbose close storage'
+
