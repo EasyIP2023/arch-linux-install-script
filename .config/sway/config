@@ -26,8 +26,8 @@ font pango:monospace 14
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
-# start a terminal
-bindsym $mod+Return exec i3-sensible-terminal
+# start a terminal (This is so I can use rvm)
+bindsym $mod+Return exec "termite --exec='/bin/bash --login'"
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -208,13 +208,16 @@ client.unfocused #073642 #073642 #93a1a1 #586e75 #073642
 client.urgent #d33682 #d33682 #fdf6e3 #dc322f #d33682
 
 # start keepassx
-bindsym $mod+p exec keepassx
+bindsym $mod+p exec ~/storage/keepassx/build/src/keepassx
 
 # start atom text editor
 bindsym $mod+c exec atom
 
 # start firefox
 bindsym $mod+Shift+f exec firefox
+
+# start steam
+bindsym $mod+Shift+s exec steam
 
 # start networkmanager gui
 bindsym $mod+n exec nm-connection-editor
@@ -350,4 +353,4 @@ mode "$mode_gaps_left" {
   bindsym Escape mode "default"
 }
 
-output "*" background /home/vince/Pictures/chill.jpg fill
+output "*" background /home/vince/Pictures/anime-girl-and-butterfly.jpg fill

@@ -188,7 +188,7 @@ user_creation () {
 install_bootloader () {
   title "Installing Bootloader"
   pacman -S gptfdisk syslinux --noconfirm
-  pacman -S linux linux-firmware mkinitcpio --noconfirm
+  pacman -S mkinitcpio linux linux-firmware --noconfirm
   syslinux-install_update -iam
   # Updated syslinux config
   echo "" > /boot/syslinux/syslinux.cfg
@@ -208,7 +208,6 @@ install_graphics_audio_and_others () {
   title "Installing graphics/audio and other software that I use regularly"
 
   pacman -S wayland wayland-protocols libinput xorg-server-xwayland --noconfirm
-  pacman -S lib32-mesa-libgl --noconfirm
   pacman -S evince --noconfirm
   pacman -S alsa alsa-utils pulseaudio pulseaudio-alsa --noconfirm
   pacman -S brightnessctl --noconfirm
@@ -237,7 +236,6 @@ install_networking () {
   title "Network Package Installation"
   pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog net-tools --noconfirm
   pacman -S nm-connection-editor iw --noconfirm
-  systemctl enable NetworkManager.service
   pacman -S tor --noconfirm
   pacman -S proxychains-ng --noconfirm
   pacman -S macchanger --noconfirm
@@ -245,6 +243,7 @@ install_networking () {
 
   # FireWall
   pacman -S ufw --noconfirm
+  systemctl enable NetworkManager.service
 
   return $SUCCESS
 }
@@ -278,8 +277,9 @@ install_de () {
 
 install_power () {
   title "Installing power packages"
-  pacman -S powertop --noconfirm
+  pacman -S tlp --noconfirm
   pacman -S acpi --noconfirm
+  systemctl enable tlp.service
   return $SUCCESS
 }
 
@@ -306,14 +306,6 @@ install_firefox () {
   return $SUCCESS
 }
 
-install_google_chrome () {
-  title "Installing Google Chrome"
-
-  yay -S google-chrome
-
-  return $SUCCESS
-}
-
 copy_configs () {
   title "Update Configs"
 
@@ -323,8 +315,7 @@ copy_configs () {
   mv -v .local /home/$NORMAL_USER
 
   mkdir -v /home/$NORMAL_USER/Pictures
-  mv -v pics/attack-on-titan.png /home/$NORMAL_USER/Pictures
-  mv -v pics/chill.jpg /home/$NORMAL_USER/Pictures
+  mv -v pics/* /home/$NORMAL_USER/Pictures
 
   chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/.config
   chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/Pictures
@@ -359,7 +350,6 @@ main () {
   install_atom
   sleep_clear 2
 
-  # install_google_chrome
   install_firefox
   sleep_clear 2
 
@@ -369,8 +359,8 @@ main () {
   install_networking
   sleep_clear 2
 
-  install_virtul_soft
-  sleep_clear 2
+  # install_virtul_soft
+  # sleep_clear 2
 
   install_de
   sleep_clear 2
@@ -404,20 +394,7 @@ if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
 fi
 EOF
 
-cat > /etc/systemd/system/powertop.service << "EOF"
-[Unit]
-Description=Powertop tunings
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/powertop --auto-tune
-
-[Install]
-WantedBy=multi-user.target
-EOF
-systemctl enable powertop.service
-
-# Add Macspoof Config
+# Add Macspoof Config (KEEP Vincent!!!!!)
 cat > /etc/systemd/system/macspoof@.service << "EOF"
 [Unit]
 Description=macchanger on %I
@@ -460,6 +437,5 @@ echo "SUBSYSTEM==\"net\", ACTION==\"add\", ATTR{address}==\"${WLAN}\", NAME=\"wl
 # This is for mlocate
 updatedb
 
-sleep_clear 1
-title "Installation Complete"
 sleep_clear 2
+title "Installation Complete"
