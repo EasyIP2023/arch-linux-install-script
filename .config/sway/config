@@ -39,6 +39,8 @@ bindsym $mod+Shift+q kill
 # installed.
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
+xwayland disable
+
 # compositing manager
 exec xcompmgr -c -f -n
 
@@ -210,11 +212,11 @@ client.urgent #d33682 #d33682 #fdf6e3 #dc322f #d33682
 # start keepassx
 bindsym $mod+p exec ~/storage/keepassx/build/src/keepassx
 
-# start atom text editor
-bindsym $mod+c exec atom
+# start bluefish text editor
+bindsym $mod+c exec bluefish
 
 # start firefox
-bindsym $mod+Shift+f exec firefox
+bindsym $mod+Shift+f exec export MOZ_ENABLE_WAYLAND=1 && firefox
 
 # start steam
 bindsym $mod+Shift+s exec steam

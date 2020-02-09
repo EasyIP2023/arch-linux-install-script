@@ -34,7 +34,6 @@ warn() {
 err() {
   printf "%s[-] ERROR: %s%s\n" "${RED}" "${@}" "${NC}"
   exit $FAILURE
-  return $SUCCESS
 }
 
 banner() {
@@ -50,7 +49,7 @@ banner() {
       "$line" "${NC}"
   done
   printf "${REDB}%*s${NC}\n\n\n" "${COLUMNS:-$(tput cols)}" | tr ' ' '-'
-  return "$SUCCESS"
+  return $SUCCESS
 }
 
 sleep_clear(){
@@ -64,7 +63,7 @@ title() {
   banner
   printf "${GREEN}>> %s${NC}\n\n\n" "${@}"
 
-  return "${SUCCESS}"
+  return $SUCCESS
 }
 
 check_env() {
@@ -199,7 +198,6 @@ install_bootloader () {
   echo "  INITRD ../initramfs-linux.img" >> /boot/syslinux/syslinux.cfg
   sed -i 's/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/HOOKS=(base udev autodetect modconf block encrypt filesystems keyboard fsck)/g' /etc/mkinitcpio.conf
   pacman -S f2fs-tools btrfs-progs --noconfirm
-  mkinitcpio -p linux
 
   return $SUCCESS
 }
@@ -256,7 +254,6 @@ install_ufw_rules () {
   ufw allow out 53/udp
   ufw allow out 22,24,53,80,443/tcp
   ufw allow out 8080,9050,9898/tcp
-  mv -v before.rules /etc/ufw/
 
   ufw enable
 
@@ -294,9 +291,10 @@ install_yay () {
   return $SUCCESS
 }
 
-install_atom () {
-  title "Installing Atom"
-  pacman -S atom --noconfirm
+install_te () {
+  title "Installing Text Editor"
+  pacman -S bluefish --noconfirm
+  #pacman -S atom --noconfirm
   return $SUCCESS
 }
 
@@ -312,18 +310,15 @@ copy_configs () {
   mv -v .config /home/$NORMAL_USER
   mv -v .bash_profile /home/$NORMAL_USER
   mv -v .bashrc /home/$NORMAL_USER
-  mv -v .local /home/$NORMAL_USER
+  mv -v before.rules /etc/ufw/
 
   mkdir -v /home/$NORMAL_USER/Pictures
   mv -v pics/* /home/$NORMAL_USER/Pictures
 
   chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/.config
   chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/Pictures
-  chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/.local
   chown -v $NORMAL_USER:users /home/$NORMAL_USER/.bashrc
   chown -v $NORMAL_USER:users /home/$NORMAL_USER/.bash_profile
-
-  fc-cache -fv
 
   return $SUCCESS
 }
@@ -347,7 +342,7 @@ main () {
   install_graphics_audio_and_others
   sleep_clear 2
 
-  install_atom
+  install_te
   sleep_clear 2
 
   install_firefox
@@ -371,8 +366,8 @@ main () {
   # install_yay
   # sleep_clear 2
 
-  install_ufw_rules
-  sleep_clear 2
+  # install_ufw_rules
+  # sleep_clear 2
 
   copy_configs
 
@@ -381,18 +376,11 @@ main () {
 
 main "${@}"
 
-cat >> /etc/pacman.conf << "EOF"
-[archlinuxfr]
-SigLevel = Never
-Server = http://repo.archlinux.fr/$arch
-EOF
-pacman -Syy
-
-cat >> /etc/bash.bashrc << "EOF"
-if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
-  XKB_DEFAULT_LAYOUT=us exec sway
-fi
-EOF
+# cat >> /etc/bash.bashrc << "EOF"
+# if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
+#   XKB_DEFAULT_LAYOUT=us exec sway
+# fi
+# EOF
 
 # Add Macspoof Config (KEEP Vincent!!!!!)
 cat > /etc/systemd/system/macspoof@.service << "EOF"
@@ -426,6 +414,7 @@ set incsearch
 set hlsearch
 EOF
 
+sleep_clear 1
 ifconfig
 printf "Enter ethernet address(xx:xx:xx:xx:xx:xx): "
 read ETHER
@@ -437,5 +426,5 @@ echo "SUBSYSTEM==\"net\", ACTION==\"add\", ATTR{address}==\"${WLAN}\", NAME=\"wl
 # This is for mlocate
 updatedb
 
-sleep_clear 2
 title "Installation Complete"
+sleep_clear 2
