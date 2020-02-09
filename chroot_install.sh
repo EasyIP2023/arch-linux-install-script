@@ -205,7 +205,7 @@ install_bootloader () {
 install_graphics_audio_and_others () {
   title "Installing graphics/audio and other software that I use regularly"
 
-  pacman -S wayland wayland-protocols libinput xorg-server-xwayland --noconfirm
+  pacman -S wayland wayland-protocols libinput --noconfirm
   pacman -S evince --noconfirm
   pacman -S alsa alsa-utils pulseaudio pulseaudio-alsa --noconfirm
   pacman -S brightnessctl --noconfirm
@@ -232,8 +232,7 @@ install_java () {
 
 install_networking () {
   title "Network Package Installation"
-  pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog net-tools --noconfirm
-  pacman -S nm-connection-editor iw --noconfirm
+  pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog net-tools iw --noconfirm
   pacman -S tor --noconfirm
   pacman -S proxychains-ng --noconfirm
   pacman -S macchanger --noconfirm

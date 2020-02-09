@@ -221,9 +221,6 @@ bindsym $mod+Shift+f exec export MOZ_ENABLE_WAYLAND=1 && firefox
 # start steam
 bindsym $mod+Shift+s exec steam
 
-# start networkmanager gui
-bindsym $mod+n exec nm-connection-editor
-
 # open up folder nautilus
 bindsym $mod+z exec nautilus
 
