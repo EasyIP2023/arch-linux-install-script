@@ -63,10 +63,6 @@ LIB_X86_STEAM_RUNTIME=/home/vince/.local/share/Steam/ubuntu12_32/steam-runtime/u
 LIB_X86_STEAM=/home/vince/.local/share/Steam/ubuntu12_32/steam-runtime/lib/x86_64-linux-gnu/
 export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:$WB_SOS:$LIB_X86_STEAM_RUNTIME:$LIB_X86_STEAM
 
-export SDL_VIDEODRIVER=wayland
-export MOZ_ENABLE_WAYLAND=1
-export XDG_SESSION_TYPE=wayland
-
 alias luc_install='sudo ninja install -C $HOME/storage/git/lucurious/ibuild'
 alias luc_uninstall='sudo ninja uninstall -C $HOME/storage/git/lucurious/ibuild'
 alias bat='upower -i /org/freedesktop/UPower/devices/battery_BAT0| grep -E "state|to full|percentage"'

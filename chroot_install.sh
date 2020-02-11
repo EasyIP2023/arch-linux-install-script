@@ -341,8 +341,8 @@ main () {
   install_graphics_audio_and_others
   sleep_clear 2
 
-  install_te
-  sleep_clear 2
+  # install_te
+  # sleep_clear 2
 
   install_firefox
   sleep_clear 2
@@ -375,11 +375,16 @@ main () {
 
 main "${@}"
 
-# cat >> /etc/bash.bashrc << "EOF"
 # if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
 #   XKB_DEFAULT_LAYOUT=us exec sway
 # fi
-# EOF
+
+cat >> /etc/bash.bashrc << "EOF"
+export SDL_VIDEODRIVER=wayland
+export MOZ_ENABLE_WAYLAND=1
+export XDG_SESSION_TYPE=wayland
+export QT_QPA_PLATFORM=wayland-egl
+EOF
 
 # Add Macspoof Config (KEEP Vincent!!!!!)
 cat > /etc/systemd/system/macspoof@.service << "EOF"
