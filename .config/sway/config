@@ -210,13 +210,13 @@ client.unfocused #073642 #073642 #93a1a1 #586e75 #073642
 client.urgent #d33682 #d33682 #fdf6e3 #dc322f #d33682
 
 # start keepassx
-bindsym $mod+p exec ~/storage/keepassx/build/src/keepassx
+bindsym $mod+p exec export QT_QPA_PLATFORM=xcb && ~/storage/keepassx/build/src/keepassx
 
-# start bluefish text editor
-bindsym $mod+c exec bluefish
+# start atom text editor
+bindsym $mod+c exec atom
 
 # start firefox
-bindsym $mod+Shift+f exec export MOZ_ENABLE_WAYLAND=1 && firefox
+bindsym $mod+Shift+f exec firefox
 
 # start steam
 bindsym $mod+Shift+s exec steam
