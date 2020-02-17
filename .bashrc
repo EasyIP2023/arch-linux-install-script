@@ -6,8 +6,6 @@
 [[ $- != *i* ]] && return
 PS1='\[\e[1;91m\]\u@\h: \[\e[33m\]\W \[\e[32m\]\$ \[\033[0m\]'
 
-alias ls='ls --color=auto'
-
 NORMAL=`echo -e '\033[0m'`
 RED=`echo -e '\e[1;91m'`
 GREEN=`echo -e '\e[32m'`
@@ -32,8 +30,8 @@ function colored_ip(){
     -e "s/^\([0-9]\+: \+\)\([^ \t]\+\)/\1${IFACE}\2${NORMAL}/"
 }
 
+alias ls='ls --color=auto'
 alias ifconfig='colored_ip'
-alias ls='ls -l --color=auto'
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
@@ -70,6 +68,3 @@ alias disk_mem='df -h /dev/mapper/r00t && df -h /dev/mapper/storage'
 alias open_drive='sudo cryptsetup open --verbose --type luks /dev/sda1 storage && sudo mount -v /dev/mapper/storage $HOME/storage'
 alias close_drive='sudo umount -Rv $HOME/storage && sudo cryptsetup --verbose close storage'
 
-
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
