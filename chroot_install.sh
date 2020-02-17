@@ -17,6 +17,7 @@ REDB="`tput bold; tput setaf 1`"
 YELLOW="`tput setaf 3`"
 YELLOWB="`tput bold ; tput setaf 3`"
 BLINK="`tput blink`"
+
 NORMAL_USER=""
 
 wprintf() {
@@ -61,7 +62,7 @@ sleep_clear(){
 
 title() {
   banner
-  printf "${GREEN}>> %s${NC}\n\n\n" "${@}"
+  printf "${GREEN}>> %s${NC}\n\n\n" "${@}" "${WHITE}" && printf "\e[0m" # Reset term color like this for now
 
   return $SUCCESS
 }
@@ -174,7 +175,7 @@ user_creation () {
   wprintf "Enter root user password: \n"
   passwd
 
-  wprintf "Enter Normal User username: "
+  wprintf "\nEnter Normal User username: "
   read NORMAL_USER
   useradd -m -g users -G wheel,games,power,optical,storage,scanner,lp,audio,video -s /bin/bash $NORMAL_USER
   passwd $NORMAL_USER
@@ -205,9 +206,10 @@ install_bootloader () {
 install_graphics_audio_and_others () {
   title "Installing graphics/audio and other software that I use regularly"
 
-  pacman -S wayland wayland-protocols libinput --noconfirm
+  pacman -S wayland wayland-protocols libinput xorg-server-xwayland --noconfirm
   pacman -S evince --noconfirm
   pacman -S alsa alsa-utils pulseaudio pulseaudio-alsa --noconfirm
+  pacman -S bluez bluez-utils pulseaudio-bluetooth --noconfirm
   pacman -S brightnessctl --noconfirm
   pacman -S playerctl --noconfirm
   pacman -S nautilus --noconfirm
@@ -292,8 +294,7 @@ install_yay () {
 
 install_te () {
   title "Installing Text Editor"
-  pacman -S bluefish --noconfirm
-  #pacman -S atom --noconfirm
+  pacman -S atom --noconfirm
   return $SUCCESS
 }
 
@@ -432,3 +433,4 @@ updatedb
 
 title "Installation Complete"
 sleep_clear 2
+

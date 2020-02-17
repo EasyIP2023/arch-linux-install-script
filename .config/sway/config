@@ -14,7 +14,7 @@ font pango:monospace 14
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
-#font pango:DejaVu Sans Mono 8
+# font pango:DejaVu Sans Mono 8
 
 # Before i3 v4.8, we used to recommend this one as the default:
 # font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
@@ -39,7 +39,7 @@ bindsym $mod+Shift+q kill
 # installed.
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
-xwayland disable
+xwayland disabled
 
 # compositing manager
 exec xcompmgr -c -f -n
@@ -192,18 +192,18 @@ bindsym $mod+r mode "resize"
 
 # Start polybar to display a workspace bar (plus the system information i3status
 # finds out, if available)
-bar {
-  position top
-  colors {
-    separator #268bd2
-    background #002b36
-    statusline #839496
-    focused_workspace #fdf6e3 #ff00ff #fdf6e3
-    active_workspace #fdf6e3 #ff00ff #fdf6e3
-    inactive_workspace #002b36 #586e75 #002b36
-    urgent_workspace #d33682 #d33682 #fdf6e3
-  }
-}
+# bar {
+#   position top
+#   colors {
+#     separator #268bd2
+#     background #002b36
+#     statusline #839496
+#     focused_workspace #fdf6e3 #ff00ff #fdf6e3
+#     active_workspace #fdf6e3 #ff00ff #fdf6e3
+#     inactive_workspace #002b36 #586e75 #002b36
+#     urgent_workspace #d33682 #d33682 #fdf6e3
+#   }
+# }
 client.focused #ff00ff #ff00ff #fdf6e3 #fdf6e3 #ff00ff
 client.focused_inactive #073642 #073642 #eee8d5 #6c71c4 #073642
 client.unfocused #073642 #073642 #93a1a1 #586e75 #073642
@@ -223,6 +223,9 @@ bindsym $mod+Shift+s exec steam
 
 # open up folder nautilus
 bindsym $mod+z exec nautilus
+
+# Exit Sway bindings
+bindsym $mod+Shift+m exec sway exit
 
 set $mode_gaps Gaps: (o)uter, (i)nner, (h)orizontal, (v)ertical, (t)op, (r)ight, (b)ottom, (l)eft
 set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
