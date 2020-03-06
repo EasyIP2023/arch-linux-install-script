@@ -294,7 +294,7 @@ install_yay () {
 
 install_te () {
   title "Installing Text Editor"
-  pacman -S atom --noconfirm
+  pacman -S bluefish --noconfirm
   return $SUCCESS
 }
 
@@ -342,8 +342,8 @@ main () {
   install_graphics_audio_and_others
   sleep_clear 2
 
-  # install_te
-  # sleep_clear 2
+  install_te
+  sleep_clear 2
 
   install_firefox
   sleep_clear 2

@@ -61,10 +61,11 @@ LIB_X86_STEAM_RUNTIME=/home/vince/.local/share/Steam/ubuntu12_32/steam-runtime/u
 LIB_X86_STEAM=/home/vince/.local/share/Steam/ubuntu12_32/steam-runtime/lib/x86_64-linux-gnu/
 export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:$WB_SOS:$LIB_X86_STEAM_RUNTIME:$LIB_X86_STEAM
 
-alias luc_install='sudo ninja install -C $HOME/storage/git/lucurious/ibuild'
-alias luc_uninstall='sudo ninja uninstall -C $HOME/storage/git/lucurious/ibuild'
+alias luc_install='sudo ninja install -C $HOME/storage/git/syfyme/lucurious/ibuild'
+alias luc_uninstall='sudo ninja uninstall -C $HOME/storage/git/syfyme/lucurious/ibuild'
 alias bat='upower -i /org/freedesktop/UPower/devices/battery_BAT0| grep -E "state|to full|percentage"'
 alias disk_mem='df -h /dev/mapper/r00t && df -h /dev/mapper/storage'
 alias open_drive='sudo cryptsetup open --verbose --type luks /dev/sda1 storage && sudo mount -v /dev/mapper/storage $HOME/storage'
 alias close_drive='sudo umount -Rv $HOME/storage && sudo cryptsetup --verbose close storage'
+alias valgrind='valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --undef-value-errors=no --trace-children=yes'
 

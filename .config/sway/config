@@ -212,14 +212,14 @@ client.urgent #d33682 #d33682 #fdf6e3 #dc322f #d33682
 # start keepassx
 bindsym $mod+p exec export QT_QPA_PLATFORM=xcb && ~/storage/keepassx/build/src/keepassx
 
-# start atom text editor
-bindsym $mod+c exec atom
+# start bluefish text editor
+bindsym $mod+c exec bluefish
 
 # start firefox
 bindsym $mod+Shift+f exec firefox
 
 # start steam
-bindsym $mod+Shift+s exec steam
+bindsym $mod+Shift+s exec export SDL_VIDEODRIVER=x && steam
 
 # open up folder nautilus
 bindsym $mod+z exec nautilus
