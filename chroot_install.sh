@@ -380,12 +380,16 @@ main "${@}"
 #   XKB_DEFAULT_LAYOUT=us exec sway
 # fi
 
+# Global Environment Variables
 cat >> /etc/bash.bashrc << "EOF"
 export SDL_VIDEODRIVER=wayland
 export MOZ_ENABLE_WAYLAND=1
 export XDG_SESSION_TYPE=wayland
 export QT_QPA_PLATFORM=wayland-egl
 EOF
+
+# Set automatic niceness for all processes running
+echo "${NORMAL_USER} hard priority -10" >> /etc/security/limits.conf
 
 # Add Macspoof Config (KEEP Vincent!!!!!)
 cat > /etc/systemd/system/macspoof@.service << "EOF"
