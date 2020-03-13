@@ -215,7 +215,6 @@ install_graphics_audio_and_others () {
   pacman -S nautilus --noconfirm
   pacman -S mlocate --noconfirm
   pacman -S termite --noconfirm
-  pacman -S xcompmgr --noconfirm
   # To take screenshot in a wayland compositor
   pacman -S grim --noconfirm
   pacman -S slurp --noconfirm

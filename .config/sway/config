@@ -41,9 +41,6 @@ bindsym $mod+Shift+q kill
 
 xwayland disabled
 
-# compositing manager
-exec xcompmgr -c -f -n
-
 # Pulse Audio controls
 bindsym XF86AudioRaiseVolume exec pactl set-sink-volume $(pacmd list-sinks |awk '/* index:/{print $3}') +5% #increase sound volume
 bindsym XF86AudioLowerVolume exec pactl set-sink-volume $(pacmd list-sinks |awk '/* index:/{print $3}') -5% #decrease sound volume
