@@ -47,7 +47,7 @@ if [ $UID -ne 0 ]; then
   alias tor_start='sudo systemctl start tor.service'
   alias tor_stop='sudo systemctl stop tor.service'
   alias orphaned_packets='sudo pacman -Qdt'
-	alias rm_orphaned_packets='sudo pacman -Rns $(pacman -Qtdq)'
+  alias rm_orphaned_packets='sudo pacman -Rns $(pacman -Qtdq)'
   alias rules='sudo ufw status verbose'
   alias kern-log='journalctl -k --since "20 min ago"'
   alias kern-make='make -C /lib/modules/$(uname -r)/build M=$PWD modules'
@@ -68,4 +68,3 @@ alias disk_mem='df -h /dev/mapper/r00t && df -h /dev/mapper/storage'
 alias open_drive='sudo cryptsetup open --verbose --type luks /dev/sda1 storage && sudo mount -v /dev/mapper/storage $HOME/storage'
 alias close_drive='sudo umount -Rv $HOME/storage && sudo cryptsetup --verbose close storage'
 alias valgrind='valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --undef-value-errors=no --trace-children=yes'
-

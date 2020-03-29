@@ -352,4 +352,4 @@ mode "$mode_gaps_left" {
   bindsym Escape mode "default"
 }
 
-output "*" background /home/vince/Pictures/anime-girl-and-butterfly.jpg fill
+output "*" background /home/vince/Pictures/ahsoka-tano-wallpaper.png fill
