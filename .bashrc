@@ -56,15 +56,20 @@ if [ $UID -ne 0 ]; then
 fi
 alias man_perlpod='man perlpod'
 
-WB_SOS=/home/vince/storage/steam/steamapps/common/MountBlade\ Warband
+WB_SOS=$HOME/storage/steam/steamapps/common/MountBlade\ Warband
 LIB_X86_STEAM_RUNTIME=/home/vince/.local/share/Steam/ubuntu12_32/steam-runtime/usr/lib/x86_64-linux-gnu
 LIB_X86_STEAM=/home/vince/.local/share/Steam/ubuntu12_32/steam-runtime/lib/x86_64-linux-gnu/
 export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:$WB_SOS:$LIB_X86_STEAM_RUNTIME:$LIB_X86_STEAM
 
-alias luc_install='sudo ninja install -C $HOME/storage/git/syfyme/lucurious/ibuild'
-alias luc_uninstall='sudo ninja uninstall -C $HOME/storage/git/syfyme/lucurious/ibuild'
+LUC_IBUILD=$HOME/storage/git/syfyme/lucurious/ibuild
+alias luc_install='sudo ninja install -C $LUC_IBUILD'
+alias luc_uninstall='sudo ninja uninstall -C $LUC_IBUILD'
 alias bat='upower -i /org/freedesktop/UPower/devices/battery_BAT0| grep -E "state|to full|percentage"'
-alias disk_mem='df -h /dev/mapper/r00t && df -h /dev/mapper/storage'
+alias disk_mem='df -h /dev/mapper/r00t && echo && df -h /dev/mapper/storage'
 alias open_drive='sudo cryptsetup open --verbose --type luks /dev/sda1 storage && sudo mount -v /dev/mapper/storage $HOME/storage'
 alias close_drive='sudo umount -Rv $HOME/storage && sudo cryptsetup --verbose close storage'
 alias valgrind='valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --undef-value-errors=no --trace-children=yes'
+
+export RUBYOPT='-W:no-deprecated -W:no-experimental'
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin:$HOME/.rvm/rubies/ruby-2.7.0/bin"
