@@ -6,28 +6,23 @@
 [[ $- != *i* ]] && return
 PS1='\[\e[1;91m\]\u@\h: \[\e[33m\]\W \[\e[32m\]\$ \[\033[0m\]'
 
-NORMAL=`echo -e '\033[0m'`
-RED=`echo -e '\e[1;91m'`
-GREEN=`echo -e '\e[32m'`
+NORMAL=`echo -e '\x1b[0m'`
+RED=`echo -e '\x1B[31;1m'`
 LGREEN=`echo -e '\033[1;32m'`
-BLUE=`echo -e '\033[0;34m'`
+IBLUE=`echo -e '\x1B[30;1m'`
 LBLUE=`echo -e '\033[1;34m'`
-YELLOW=`echo -e '\e[33m'`
-MAGENTA=`echo -e '\033[0;95m'`
-IP4=$LGREEN
-IP6=$MAGENTA
-IFACE=$YELLOW
-DEFAULT_ROUTE=$LBLUE
+YELLOW=`echo -e '\x1B[33;1m'`
+MAGENTA=`echo -e '\e[37;1m'`
 IP_CMD=$(which ifconfig)
 
 function colored_ip(){
   ${IP_CMD} $@ | sed \
-    -e "s/inet [^ ]\+ /${IP4}&${RED}/g"\
+    -e "s/inet [^ ]\+ /${LGREEN}&${NORMAL}/g"\
     -e "s/ether [^ ]\+ /${RED}&${NORMAL}/g"\
     -e "s/netmask [^ ]\+ /${LBLUE}&${NORMAL}/g"\
-    -e "s/broadcast [^ ]\+ /${MAGENTA}&${NORMAL}/g"\
-    -e "s/^default via .*$/${DEFAULT_ROUTE}&${NORMAL}/"\
-    -e "s/^\([0-9]\+: \+\)\([^ \t]\+\)/\1${IFACE}\2${NORMAL}/"
+    -e "s/broadcast [^ ]\+ /${IBLUE}&${NORMAL}/g"\
+    -e "s/^default via .*$/${YELLOW}&${NORMAL}/g"\
+    -e "s/^\([0-9]\+: \+\)\([^ \t]\+\)/\1${MAGENTA}\2${NORMAL}/g"
 }
 
 alias ls='ls --color=auto'
@@ -35,7 +30,7 @@ alias ifconfig='colored_ip'
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
-alias vi=vim
+alias vi='vim'
 alias convert_to_haml="find . -name \*.erb -print | sed 'p;s/.erb$/.haml/' | xargs -n2 html2haml"
 if [ $UID -ne 0 ]; then
   alias reboot='sudo reboot'
@@ -54,7 +49,6 @@ if [ $UID -ne 0 ]; then
   alias kern-clean='make -C /lib/modules/$(uname -r)/build M=$PWD clean'
   alias devices='cat /proc/devices'
 fi
-alias man_perlpod='man perlpod'
 
 WB_SOS=$HOME/storage/steam/steamapps/common/MountBlade\ Warband
 LIB_X86_STEAM_RUNTIME=/home/vince/.local/share/Steam/ubuntu12_32/steam-runtime/usr/lib/x86_64-linux-gnu
@@ -68,8 +62,9 @@ alias bat='upower -i /org/freedesktop/UPower/devices/battery_BAT0| grep -E "stat
 alias disk_mem='df -h /dev/mapper/r00t && echo && df -h /dev/mapper/storage'
 alias open_drive='sudo cryptsetup open --verbose --type luks /dev/sda1 storage && sudo mount -v /dev/mapper/storage $HOME/storage'
 alias close_drive='sudo umount -Rv $HOME/storage && sudo cryptsetup --verbose close storage'
-alias valgrind='valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --undef-value-errors=no --trace-children=yes'
+#alias valgrind='valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --undef-value-errors=no --trace-children=yes'
 
 export RUBYOPT='-W:no-deprecated -W:no-experimental'
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin:$HOME/.rvm/rubies/ruby-2.7.0/bin"
+
