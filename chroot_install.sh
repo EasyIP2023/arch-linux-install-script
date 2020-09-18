@@ -190,14 +190,18 @@ install_bootloader () {
   pacman -S gptfdisk syslinux --noconfirm
   pacman -S mkinitcpio linux linux-firmware --noconfirm
   syslinux-install_update -iam
-  # Updated syslinux config
-  echo "" > /boot/syslinux/syslinux.cfg
-  echo "DEFAULT arch" >> /boot/syslinux/syslinux.cfg
-  echo "Label arch" >> /boot/syslinux/syslinux.cfg
-  echo "  LINUX ../vmlinuz-linux" >> /boot/syslinux/syslinux.cfg
-  echo "  APPEND cryptdevice=/dev/nvme0n1p2:r00t root=/dev/mapper/r00t rw ipv6.disable=1" >> /boot/syslinux/syslinux.cfg
-  echo "  INITRD ../initramfs-linux.img" >> /boot/syslinux/syslinux.cfg
-  sed -i 's/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/HOOKS=(base udev autodetect modconf block encrypt filesystems keyboard fsck)/g' /etc/mkinitcpio.conf
+
+  # Update syslinux config
+  device_file=$(lsblk -r -o name,fstype | grep crypto_LUKS | awk '{printf $1}')
+  echo "
+  DEFAULT arch
+  Label arch
+    LINUX ../vmlinuz-linux
+    APPEND cryptdevice=/dev/${device_file}:r00t root=/dev/mapper/r00t rw ipv6.disable=1
+    INITRD ../initramfs-linux.img
+  " > /boot/syslinux/syslinux.cfg
+
+  sed -i 's/block filesystems/block encrypt filesystems/g' /etc/mkinitcpio.conf
   pacman -S f2fs-tools btrfs-progs --noconfirm
 
   return $SUCCESS
@@ -224,13 +228,6 @@ install_graphics_audio_and_others () {
   return $SUCCESS
 }
 
-install_java () {
-  title "Java Install"
-  pacman -S jre-openjdk-headless jre-openjdk jdk-openjdk openjdk-doc openjdk-src jre10-openjdk-headless jre10-openjdk jdk10-openjdk openjdk10-doc openjdk10-src java-openjfx java-openjfx-doc java-openjfx-src --noconfirm
-
-  return $SUCCESS
-}
-
 install_networking () {
   title "Network Package Installation"
 
@@ -242,15 +239,15 @@ install_networking () {
   # FireWall
   pacman -S ufw --noconfirm
 
-	mv iw_main.conf /etc/iwd/main.conf
-	
-	systemctl enable iwd.service
-	systemctl enable systemd-resolved.service
+  mv iw_main.conf /etc/iwd/main.conf
+
+  systemctl enable iwd.service
+  systemctl enable systemd-resolved.service
 
   return $SUCCESS
 }
 
-install_ufw_rules () {
+update_ufw_rules () {
   title "Creating Ufw rules"
 
   ufw default deny outgoing
@@ -260,6 +257,9 @@ install_ufw_rules () {
   ufw allow out 8080,9050,9898/tcp
 
   ufw enable
+
+  # Going to do anyways, becuase why not
+  systemctl enable ufw.service
 
   return $SUCCESS
 }
@@ -351,9 +351,6 @@ main () {
   install_firefox
   sleep_clear 2
 
-  # install_java
-  # sleep_clear 2
-
   install_networking
   sleep_clear 2
 
@@ -369,8 +366,8 @@ main () {
   # install_yay
   # sleep_clear 2
 
-  # install_ufw_rules
-  # sleep_clear 2
+  update_ufw_rules
+  sleep_clear 2
 
   copy_configs
 
