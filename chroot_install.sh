@@ -233,15 +233,16 @@ install_java () {
 
 install_networking () {
   title "Network Package Installation"
-  pacman -S networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc wpa_supplicant wireless_tools dialog net-tools iw --noconfirm
+
+  pacman -S iwd net-tools --noconfirm
   pacman -S tor --noconfirm
   pacman -S proxychains-ng --noconfirm
-  pacman -S macchanger --noconfirm
   pacman -S openssh --noconfirm
 
   # FireWall
   pacman -S ufw --noconfirm
-  systemctl enable NetworkManager.service
+  systemctl enable iwd.service
+  mv iw_main.conf /etc/iwd/main.conf
 
   return $SUCCESS
 }
@@ -375,36 +376,12 @@ main () {
 
 main "${@}"
 
-# if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
-#   XKB_DEFAULT_LAYOUT=us exec sway
-# fi
-
 # Global Environment Variables
 cat >> /etc/bash.bashrc << "EOF"
 export SDL_VIDEODRIVER=wayland
 export MOZ_ENABLE_WAYLAND=1
 export XDG_SESSION_TYPE=wayland
 export QT_QPA_PLATFORM=wayland-egl
-EOF
-
-# Set automatic niceness for all processes running
-echo "${NORMAL_USER} hard priority -10" >> /etc/security/limits.conf
-
-# Add Macspoof Config (KEEP Vincent!!!!!)
-cat > /etc/systemd/system/macspoof@.service << "EOF"
-[Unit]
-Description=macchanger on %I
-Wants=network-pre.target
-Before=network-pre.target
-BindsTo=sys-subsystem-net-devices-%i.device
-After=sys-subsystem-net-devices-%i.device
-
-[Service]
-ExecStart=/usr/bin/macchanger -r %I
-Type=oneshot
-
-[Install]
-WantedBy=multi-user.target
 EOF
 
 # Add vim config
@@ -421,15 +398,6 @@ set showmatch
 set incsearch
 set hlsearch
 EOF
-
-sleep_clear 1
-ifconfig
-printf "Enter ethernet address(xx:xx:xx:xx:xx:xx): "
-read ETHER
-printf "Enter wireless address(xx:xx:xx:xx:xx:xx): "
-read WLAN
-echo "SUBSYSTEM==\"net\", ACTION==\"add\", ATTR{address}==\"${ETHER}\", NAME=\"eth0\"" >> /etc/udev/rules.d/10-network.rules
-echo "SUBSYSTEM==\"net\", ACTION==\"add\", ATTR{address}==\"${WLAN}\", NAME=\"wlan0\"" >> /etc/udev/rules.d/10-network.rules
 
 # This is for mlocate
 updatedb
