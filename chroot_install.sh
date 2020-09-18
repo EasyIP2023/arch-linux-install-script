@@ -241,8 +241,11 @@ install_networking () {
 
   # FireWall
   pacman -S ufw --noconfirm
-  systemctl enable iwd.service
-  mv iw_main.conf /etc/iwd/main.conf
+
+	mv iw_main.conf /etc/iwd/main.conf
+	
+	systemctl enable iwd.service
+	systemctl enable systemd-resolved.service
 
   return $SUCCESS
 }
