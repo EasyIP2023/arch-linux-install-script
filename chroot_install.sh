@@ -295,12 +295,6 @@ install_yay () {
   return $SUCCESS
 }
 
-install_te () {
-  title "Installing Text Editor"
-  pacman -S bluefish --noconfirm
-  return $SUCCESS
-}
-
 install_firefox () {
   title "Installing Firefox"
   pacman -S firefox --noconfirm
@@ -343,9 +337,6 @@ main () {
   sleep_clear 2
 
   install_graphics_audio_and_others
-  sleep_clear 2
-
-  install_te
   sleep_clear 2
 
   install_firefox
