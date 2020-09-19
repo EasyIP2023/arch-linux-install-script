@@ -313,6 +313,7 @@ copy_configs () {
   mv -v .config /home/$NORMAL_USER
   mv -v .bashrc /home/$NORMAL_USER
   mv -v before.rules /etc/ufw/
+  mv -v iwd_main.conf /etc/iwd/main.conf
 
   mkdir -v /home/$NORMAL_USER/Pictures
   mv -v pics/* /home/$NORMAL_USER/Pictures
@@ -365,8 +366,8 @@ main () {
   # install_yay
   # sleep_clear 2
 
-  update_ufw_rules
-  sleep_clear 2
+  # update_ufw_rules
+  # sleep_clear 2
 
   copy_configs
 
