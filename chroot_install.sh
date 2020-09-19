@@ -311,7 +311,6 @@ copy_configs () {
   title "Update Configs"
 
   mv -v .config /home/$NORMAL_USER
-  mv -v .bash_profile /home/$NORMAL_USER
   mv -v .bashrc /home/$NORMAL_USER
   mv -v before.rules /etc/ufw/
 
@@ -354,8 +353,8 @@ main () {
   install_networking
   sleep_clear 2
 
-  # install_virtul_soft
-  # sleep_clear 2
+  install_virtul_soft
+  sleep_clear 2
 
   install_de
   sleep_clear 2

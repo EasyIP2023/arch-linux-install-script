@@ -66,6 +66,7 @@ alias open_drive='sudo cryptsetup open --verbose --type luks "/dev/${var}" stora
 alias close_drive='sudo umount -Rv $HOME/storage && sudo cryptsetup --verbose close storage'
 #alias valgrind='valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --undef-value-errors=no --trace-children=yes'
 alias git-diff='git diff --cached'
+alias gpg_recv_key='gpg --keyserver pool.sks-keyservers.net --recv-keys'
 
 export RUBYOPT='-W:no-deprecated -W:no-experimental'
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
