@@ -223,6 +223,9 @@ install_graphics_audio_and_others () {
   pacman -S grim --noconfirm
   pacman -S slurp --noconfirm
 
+  # Install keepassx dependecies
+  pacman -S qt5-base qt5-tools --noconfirm
+
   pacman -S bash-completion --noconfirm
 
   return $SUCCESS
