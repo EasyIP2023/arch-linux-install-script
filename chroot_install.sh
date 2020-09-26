@@ -139,16 +139,17 @@ update_pacman() {
   return $SUCCESS
 }
 
-zoneinfo_hostname () {
+locale_zoneinfo_hostname () {
   title "Do Zone Info Stuff"
   # Comment out locale UTF-8
   sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen
   locale-gen
-  echo LANG=en_US.UTF-8 > /etc/locale.conf
+  echo "LANG=en_US.UTF-8" > /etc/locale.conf
   export LANG=en_US.UTF-8
 
-  #Change Time
+  # Change Time zone
   ln -sfv /usr/share/zoneinfo/US/Central /etc/localtime
+  # Update hardware clock
   hwclock --systohc --utc
 
   sleep_clear 1
@@ -237,7 +238,7 @@ install_networking () {
   pacman -S iwd net-tools --noconfirm
   pacman -S tor --noconfirm
   pacman -S proxychains-ng --noconfirm
-  pacman -S openssh --noconfirm
+  pacman -S openssh openvpn --noconfirm
 
   # FireWall
   pacman -S ufw --noconfirm
@@ -253,11 +254,22 @@ install_networking () {
 update_ufw_rules () {
   title "Creating Ufw rules"
 
-  ufw default deny outgoing
+  # deny all incoming traffic
   ufw default deny incoming
-  ufw allow out 53/udp
-  ufw allow out 22,24,53,80,443/tcp
-  ufw allow out 8080,9050,9898/tcp
+  # deny all outgoing traffic
+  ufw default deny outgoing
+
+  # All VPN communiction is considered safe
+  # and allowed out
+  ufw allow out on tun0
+ 
+  # Don't block DNS queries
+  ufw allow out 53
+
+  # Allow out commonly used ports
+  ufw allow out on 22,24,80,443/tcp
+  ufw allow out on 8080,9050,9898,5355/tcp
+  ufw allow out on 9563
 
   ufw enable
 
@@ -305,15 +317,15 @@ install_firefox () {
 }
 
 copy_configs () {
-  title "Update Configs"
+  title "Copying Configs"
 
-  mv -v .config /home/$NORMAL_USER
-  mv -v .bashrc /home/$NORMAL_USER
-  mv -v before.rules /etc/ufw/
-  mv -v iwd_main.conf /etc/iwd/main.conf
+  cp -v .config /home/$NORMAL_USER
+  cp -v .bashrc /home/$NORMAL_USER
+  cp -v before.rules /etc/ufw/
+  cp -v iwd_main.conf /etc/iwd/main.conf
 
   mkdir -v /home/$NORMAL_USER/Pictures
-  mv -v pics/* /home/$NORMAL_USER/Pictures
+  cp -v pics/* /home/$NORMAL_USER/Pictures
 
   chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/.config
   chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/Pictures
@@ -323,11 +335,40 @@ copy_configs () {
   return $SUCCESS
 }
 
+update_configs() {
+  title "Updating Configs"
+
+  # Global Environment Variables
+  echo "
+  export SDL_VIDEODRIVER=wayland
+  export MOZ_ENABLE_WAYLAND=1
+  export XDG_SESSION_TYPE=wayland
+  export QT_QPA_PLATFORM=xcb
+  " >> /etc/bash.bashrc
+
+  # Add vim config
+  echo "
+  syntax enable
+  colorscheme default
+  set tabstop=2
+  set softtabstop=2
+  set number
+  filetype indent on
+  set wildmenu
+  set lazyredraw
+  set showmatch
+  set incsearch
+  set hlsearch
+  " >> /etc/vimrc
+
+  return $SUCCESS
+}
+
 main () {
   update_pacman
   sleep_clear 2
 
-  zoneinfo_hostname
+  locale_zoneinfo_hostname
   sleep_clear 2
 
   install_blackarch
@@ -364,38 +405,17 @@ main () {
   # sleep_clear 2
 
   copy_configs
+  sleep_clear 2
+
+  update_configs
+  sleep_clear 2
+
+  # This is for mlocate
+  updatedb
+
+  title "Installation Complete"
 
   return $SUCCESS
 }
 
 main "${@}"
-
-# Global Environment Variables
-cat >> /etc/bash.bashrc << "EOF"
-export SDL_VIDEODRIVER=wayland
-export MOZ_ENABLE_WAYLAND=1
-export XDG_SESSION_TYPE=wayland
-export QT_QPA_PLATFORM=wayland-egl
-EOF
-
-# Add vim config
-cat >> /etc/vimrc << "EOF"
-syntax enable
-colorscheme default
-set tabstop=2
-set softtabstop=2
-set number
-filetype indent on
-set wildmenu
-set lazyredraw
-set showmatch
-set incsearch
-set hlsearch
-EOF
-
-# This is for mlocate
-updatedb
-
-title "Installation Complete"
-sleep_clear 2
-
