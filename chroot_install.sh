@@ -267,9 +267,9 @@ update_ufw_rules () {
   ufw allow out 53
 
   # Allow out commonly used ports
-  ufw allow out on 22,24,80,443/tcp
-  ufw allow out on 8080,9050,9898,5355/tcp
-  ufw allow out on 9563
+  ufw allow out 22,24,80,443/tcp
+  ufw allow out 8080,9050,9898,5355/tcp
+  ufw allow out 9563
 
   ufw enable
 
