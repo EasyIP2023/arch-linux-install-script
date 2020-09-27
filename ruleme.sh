@@ -11,9 +11,9 @@ fi
 # Reset the ufw config
 ufw --force reset
 
-cp -v arch-linux-install-script/before.rules /etc/ufw
+cp -v before.rules /etc/ufw
        
-# block all incomming by default
+# block all incoming by default
 ufw default deny incoming
 # block all outgoing by default
 ufw default deny outgoing
@@ -30,7 +30,7 @@ ufw allow out 53
 ufw allow out 22,24/tcp # ,80,443/tcp
 ufw allow out 8080,9050,9898,5355/tcp
 
-# Allow local network conncection
+# Allow local subnet network conncection
 ufw allow out to 192.168.1.0/24
 ufw allow in to 192.168.1.0/24
 
