@@ -243,38 +243,8 @@ install_networking () {
   # FireWall
   pacman -S ufw --noconfirm
 
-  mv iw_main.conf /etc/iwd/main.conf
-
   systemctl enable iwd.service
   systemctl enable systemd-resolved.service
-
-  return $SUCCESS
-}
-
-update_ufw_rules () {
-  title "Creating Ufw rules"
-
-  # deny all incoming traffic
-  ufw default deny incoming
-  # deny all outgoing traffic
-  ufw default deny outgoing
-
-  # All VPN communiction is considered safe
-  # and allowed out
-  ufw allow out on tun0
- 
-  # Don't block DNS queries
-  ufw allow out 53
-
-  # Allow out commonly used ports
-  ufw allow out 22,24,80,443/tcp
-  ufw allow out 8080,9050,9898,5355/tcp
-  ufw allow out 9563
-
-  ufw enable
-
-  # Going to do anyways, becuase why not
-  systemctl enable ufw.service
 
   return $SUCCESS
 }
@@ -321,7 +291,6 @@ copy_configs () {
 
   cp -v .config /home/$NORMAL_USER
   cp -v .bashrc /home/$NORMAL_USER
-  cp -v before.rules /etc/ufw/
   cp -v iwd_main.conf /etc/iwd/main.conf
 
   mkdir -v /home/$NORMAL_USER/Pictures
@@ -399,9 +368,6 @@ main () {
   sleep_clear 2
 
   # install_yay
-  # sleep_clear 2
-
-  # update_ufw_rules
   # sleep_clear 2
 
   copy_configs
