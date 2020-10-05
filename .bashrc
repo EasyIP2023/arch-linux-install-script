@@ -61,14 +61,13 @@ alias luc_uninstall='sudo ninja uninstall -C $LUC_IBUILD'
 alias bat='upower -i /org/freedesktop/UPower/devices/battery_BAT0| grep -E "state|to full|percentage"'
 alias disk_mem='df -h /dev/mapper/r00t && echo && df -h /dev/mapper/storage'
 
-var=$(lsblk -r -o name,fstype | grep crypto_LUKS | head -n1 | awk '{printf $1}')
-alias open_drive='sudo cryptsetup open --verbose --type luks "/dev/${var}" storage && sudo mount -v /dev/mapper/storage $HOME/storage'
-alias close_drive='sudo umount -Rv $HOME/storage && sudo cryptsetup --verbose close storage'
+dev_file=/dev/$(lsblk -r -o name,fstype | grep crypto_LUKS | grep -v nvme | awk '{printf $1}')
+alias open_drive='sudo cryptsetup open --verbose --type luks $dev_file storage && sudo mount -v /dev/mapper/storage $HOME/storage'
+alias close_drive='sudo umount -v $HOME/storage && sudo cryptsetup --verbose close storage'
 #alias valgrind='valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --undef-value-errors=no --trace-children=yes'
 alias git-diff='git diff --cached'
-alias gpg_recv_key='gpg --keyserver pool.sks-keyservers.net --recv-keys'
+alias gpg_recv_keys='gpg2 --keyserver pool.sks-keyservers.net --recv-keys'
 
 export RUBYOPT='-W:no-deprecated -W:no-experimental'
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin:$HOME/.rvm/rubies/ruby-2.7.0/bin"
-
