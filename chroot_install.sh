@@ -289,10 +289,11 @@ install_firefox () {
 copy_configs () {
   title "Copying Configs"
 
-  cp -v .config /home/$NORMAL_USER
+  cp -rv .config /home/$NORMAL_USER
   cp -v .bashrc /home/$NORMAL_USER
   cp -v iwd_main.conf /etc/iwd/main.conf
 
+  mkdir -v /home/$NORMAL_USER/storage
   mkdir -v /home/$NORMAL_USER/Pictures
   cp -v pics/* /home/$NORMAL_USER/Pictures
 
