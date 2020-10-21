@@ -291,6 +291,7 @@ copy_configs () {
 
   cp -rv .config /home/$NORMAL_USER
   cp -v .bashrc /home/$NORMAL_USER
+  cp -v .bashrc /root
   cp -v iwd_main.conf /etc/iwd/main.conf
 
   mkdir -v /home/$NORMAL_USER/storage
@@ -385,4 +386,4 @@ main () {
   return $SUCCESS
 }
 
-main "${@}"
+main
