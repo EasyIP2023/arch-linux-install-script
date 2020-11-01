@@ -58,7 +58,7 @@ export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:$WB_SOS:$LIB_X86_STEAM_RUNTIME:$L
 LUC_IBUILD=$HOME/storage/git/syfyme/lucurious/ibuild
 alias luc_install='sudo ninja install -C $LUC_IBUILD'
 alias luc_uninstall='sudo ninja uninstall -C $LUC_IBUILD'
-alias bat='upower -i /org/freedesktop/UPower/devices/battery_BAT0| grep -E "state|to full|percentage"'
+alias bat='acpi -b | cut -d "," -f2'
 alias disk_mem='df -h /dev/mapper/r00t && echo && df -h /dev/mapper/storage'
 
 dev_file=/dev/$(lsblk -r -o name,fstype | grep crypto_LUKS | grep -v nvme | awk '{printf $1}')

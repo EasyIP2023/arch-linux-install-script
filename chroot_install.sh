@@ -269,6 +269,21 @@ install_power () {
   return $SUCCESS
 }
 
+user_bat_monitor() {
+  title "Adding User Systemd Battery Monitor"
+
+  user_foler=/home/$NORMAL_USER/.config/systemd/user/
+
+  pacman -S espeak --noconfirm
+  mkdir -p $user_folder
+  cp bm/battery-monitor.timer bm/battery-monitor.service $user_folder
+  cp bm.battery-monitor.sh /usr/local/bin/battery-monitor
+  # Just in case
+  chmod +x /usr/local/bin/battery-monitor
+
+  return $SUCCESS
+}
+
 install_yay () {
   title "Installing yay"
 
@@ -376,6 +391,9 @@ main () {
   sleep_clear 2
 
   update_configs
+  sleep_clear 2
+
+  user_bat_monitor
   sleep_clear 2
 
   # This is for mlocate

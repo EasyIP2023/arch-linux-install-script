@@ -1,0 +1,8 @@
+[Unit]
+Description="Battery life"
+
+[Service]
+ExecStart=/usr/local/bin/battery-monitor
+
+[Install]
+WantedBy=default.target
