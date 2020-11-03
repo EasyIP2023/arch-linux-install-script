@@ -36,18 +36,12 @@ if [ $UID -ne 0 ]; then
   alias reboot='sudo reboot'
   alias update='sudo pacman -Syyu && yay -Sc --noconfirm'
   alias svim='sudo vim'
-  alias apache_start='sudo systemctl start httpd.service'
-  alias apache_stop='sudo systemctl stop httpd.service'
   alias ports='sudo netstat -antp'
   alias tor_start='sudo systemctl start tor.service'
   alias tor_stop='sudo systemctl stop tor.service'
   alias orphaned_packets='sudo pacman -Qdt'
   alias rm_orphaned_packets='sudo pacman -Rns $(pacman -Qtdq)'
   alias rules='sudo ufw status verbose'
-  alias kern-log='journalctl -k --since "20 min ago"'
-  alias kern-make='make -C /lib/modules/$(uname -r)/build M=$PWD modules'
-  alias kern-clean='make -C /lib/modules/$(uname -r)/build M=$PWD clean'
-  alias devices='cat /proc/devices'
 fi
 
 WB_SOS=$HOME/storage/steam/steamapps/common/MountBlade\ Warband
@@ -65,8 +59,6 @@ dev_file=/dev/$(lsblk -r -o name,fstype | grep crypto_LUKS | grep -v nvme | awk 
 alias open_drive='sudo cryptsetup open --verbose --type luks $dev_file storage && sudo mount -v /dev/mapper/storage $HOME/storage'
 alias close_drive='sudo umount -v $HOME/storage && sudo cryptsetup --verbose close storage'
 #alias valgrind='valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --undef-value-errors=no --trace-children=yes'
-alias git-diff='git diff --cached'
-alias gpg_recv_keys='gpg2 --keyserver pool.sks-keyservers.net --recv-keys'
 
 export RUBYOPT='-W:no-deprecated -W:no-experimental'
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
