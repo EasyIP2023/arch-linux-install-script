@@ -49,17 +49,19 @@ LIB_X86_STEAM_RUNTIME=/home/vince/.local/share/Steam/ubuntu12_32/steam-runtime/u
 LIB_X86_STEAM=/home/vince/.local/share/Steam/ubuntu12_32/steam-runtime/lib/x86_64-linux-gnu/
 export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:$WB_SOS:$LIB_X86_STEAM_RUNTIME:$LIB_X86_STEAM
 
-LUC_IBUILD=$HOME/storage/git/syfyme/lucurious/ibuild
-alias luc_install='sudo ninja install -C $LUC_IBUILD'
+LUC_DIR=$(locate lucurious/ | head -n1 | grep -Eo '.+?(lucurious)')
+LUC_IBUILD=$LUC_DIR/ibuild
+alias luc_install='cur_dir=$(pwd) && cd $LUC_DIR && sudo meson --wipe $LUC_IBUILD && sudo ninja install -C $LUC_IBUILD && cd $cur_dir'
 alias luc_uninstall='sudo ninja uninstall -C $LUC_IBUILD'
 alias bat='acpi -b | cut -d "," -f2'
 alias disk_mem='df -h /dev/mapper/r00t && echo && df -h /dev/mapper/storage'
 
-dev_file=/dev/$(lsblk -r -o name,fstype | grep crypto_LUKS | grep -v nvme | awk '{printf $1}')
-alias open_drive='sudo cryptsetup open --verbose --type luks $dev_file storage && sudo mount -v /dev/mapper/storage $HOME/storage'
+alias open_drive="sudo cryptsetup open --type luks /dev/$(lsblk -r -o name,fstype | grep crypto_LUKS | grep -v nvme | awk '{printf $1}') storage && sudo mount -v /dev/mapper/storage $HOME/storage"
 alias close_drive='sudo umount -v $HOME/storage && sudo cryptsetup --verbose close storage'
 #alias valgrind='valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --undef-value-errors=no --trace-children=yes'
 
 export RUBYOPT='-W:no-deprecated -W:no-experimental'
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin:$HOME/.rvm/rubies/ruby-2.7.0/bin"
+
+ruby_bin=$(locate rubies | grep bin | head -n1)
+export PATH="$PATH:$HOME/.rvm/bin:$ruby_bin"

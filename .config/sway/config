@@ -210,7 +210,7 @@ client.urgent #d33682 #d33682 #fdf6e3 #dc322f #d33682
 bindsym $mod+p exec export QT_QPA_PLATFORM=xcb && ~/storage/keepassx/build/src/keepassx
 
 # start bluefish text editor
-bindsym $mod+c exec ~/storage/sublime/sublime_text
+bindsym $mod+c exec /usr/local/src/sublime_text_3/sublime_text
 
 # start firefox
 bindsym $mod+Shift+f exec firefox

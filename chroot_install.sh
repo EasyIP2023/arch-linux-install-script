@@ -1,11 +1,8 @@
 #!/bin/bash
 
-TRUE=0
-FALSE=1
-
 # return codes
-SUCCESS=1337
-FAILURE=31337
+SUCCESS=0
+FAILURE=1
 
 # Colors
 WHITE="`tput setaf 7`"
@@ -63,22 +60,6 @@ sleep_clear(){
 title() {
   banner
   printf "${GREEN}>> %s${NC}\n\n\n" "${@}" "${WHITE}" && printf "\e[0m" # Reset term color like this for now
-
-  return $SUCCESS
-}
-
-check_env() {
-  if [ -f "/var/lib/pacman/db.lck" ]
-  then
-    err "pacman locked - Please remove /var/lib/pacman/db.lck"
-  fi
-}
-
-check_uid() {
-  if [ `id -u` -ne 0 ]
-  then
-    err "You must be root to run the Arch Linux installer!"
-  fi
 
   return $SUCCESS
 }
@@ -301,6 +282,17 @@ install_firefox () {
   return $SUCCESS
 }
 
+install_sublime_text() {
+  title "Installing Sublime Text"
+
+  sublime_text=sublime-latest.tar.bz2
+  wget https://download.sublimetext.com/sublime_text_3_build_3211_x64.tar.bz2 -O $sublime_text
+  tar -vxf $sublime_text -C /usr/local/src
+  rm $sublime_text
+
+  return $SUCCESS
+}
+
 copy_configs () {
   title "Copying Configs"
 
@@ -379,6 +371,9 @@ main () {
   sleep_clear 2
 
   install_de
+  sleep_clear 2
+
+  install_sublime_text
   sleep_clear 2
 
   install_power
