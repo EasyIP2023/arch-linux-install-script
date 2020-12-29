@@ -176,12 +176,12 @@ install_bootloader () {
   # Update syslinux config
   device_file=$(lsblk -r -o name,fstype | grep crypto_LUKS | awk '{printf $1}')
   echo "
-  DEFAULT arch
-  Label arch
-    LINUX ../vmlinuz-linux
-    APPEND cryptdevice=/dev/${device_file}:r00t root=/dev/mapper/r00t rw ipv6.disable=1
-    INITRD ../initramfs-linux.img
-  " > /boot/syslinux/syslinux.cfg
+DEFAULT arch
+Label arch
+  LINUX ../vmlinuz-linux
+  APPEND cryptdevice=/dev/${device_file}:r00t root=/dev/mapper/r00t rw ipv6.disable=1
+  INITRD ../initramfs-linux.img
+" > /boot/syslinux/syslinux.cfg
 
   sed -i 's/block filesystems/block encrypt filesystems/g' /etc/mkinitcpio.conf
   pacman -S f2fs-tools btrfs-progs --noconfirm
@@ -253,12 +253,13 @@ install_power () {
 user_bat_monitor() {
   title "Adding User Systemd Battery Monitor"
 
-  user_foler=/home/$NORMAL_USER/.config/systemd/user/
+  user_folder="/home/${NORMAL_USER}/.config/systemd/user/"
 
   pacman -S espeak --noconfirm
   mkdir -p $user_folder
-  cp bm/battery-monitor.timer bm/battery-monitor.service $user_folder
-  cp bm.battery-monitor.sh /usr/local/bin/battery-monitor
+  cp bm/battery-monitor.timer $user_folder
+  cp bm/battery-monitor.service $user_folder
+  cp bm/battery-monitor.sh /usr/local/bin/battery-monitor
   # Just in case
   chmod +x /usr/local/bin/battery-monitor
 
@@ -318,26 +319,26 @@ update_configs() {
 
   # Global Environment Variables
   echo "
-  export SDL_VIDEODRIVER=wayland
-  export MOZ_ENABLE_WAYLAND=1
-  export XDG_SESSION_TYPE=wayland
-  export QT_QPA_PLATFORM=xcb
-  " >> /etc/bash.bashrc
+export SDL_VIDEODRIVER=wayland
+export MOZ_ENABLE_WAYLAND=1
+export XDG_SESSION_TYPE=wayland
+export QT_QPA_PLATFORM=xcb
+" >> /etc/bash.bashrc
 
   # Add vim config
   echo "
-  syntax enable
-  colorscheme default
-  set tabstop=2
-  set softtabstop=2
-  set number
-  filetype indent on
-  set wildmenu
-  set lazyredraw
-  set showmatch
-  set incsearch
-  set hlsearch
-  " >> /etc/vimrc
+syntax enable
+colorscheme default
+set tabstop=2
+set softtabstop=2
+set number
+filetype indent on
+set wildmenu
+set lazyredraw
+set showmatch
+set incsearch
+set hlsearch
+" >> /etc/vimrc
 
   return $SUCCESS
 }
