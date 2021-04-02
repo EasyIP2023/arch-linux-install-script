@@ -300,6 +300,8 @@ copy_configs () {
   cp -rv .config /home/$NORMAL_USER
   cp -v .bashrc /home/$NORMAL_USER
   cp -v .bashrc /root
+
+  mkdir -p /etc/iwd
   cp -v iwd_main.conf /etc/iwd/main.conf
 
   mkdir -v /home/$NORMAL_USER/storage
@@ -350,8 +352,8 @@ main () {
   locale_zoneinfo_hostname
   sleep_clear 2
 
-  install_blackarch
-  sleep_clear 2
+  # install_blackarch
+  # sleep_clear 2
 
   user_creation
   sleep_clear 2
