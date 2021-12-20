@@ -207,7 +207,7 @@ client.unfocused #073642 #073642 #93a1a1 #586e75 #073642
 client.urgent #d33682 #d33682 #fdf6e3 #dc322f #d33682
 
 # start keepassx
-bindsym $mod+p exec export QT_QPA_PLATFORM=xcb && ~/storage/keepassx/build/src/keepassx
+bindsym $mod+p exec QT_QPA_PLATFORM=xcb ~/storage/keepassx/build/src/keepassx
 
 # start bluefish text editor
 bindsym $mod+c exec /usr/local/src/sublime_text_3/sublime_text
@@ -216,7 +216,7 @@ bindsym $mod+c exec /usr/local/src/sublime_text_3/sublime_text
 bindsym $mod+Shift+f exec firefox
 
 # start steam
-bindsym $mod+Shift+s exec export SDL_VIDEODRIVER=x && steam
+bindsym $mod+Shift+s exec SDL_VIDEODRIVER=x steam
 
 # open up folder nautilus
 bindsym $mod+z exec nautilus
@@ -352,4 +352,4 @@ mode "$mode_gaps_left" {
   bindsym Escape mode "default"
 }
 
-output "*" background /home/vince/Pictures/ahsoka-tano-wallpaper.png fill
+output "*" background /home/vince/Pictures/4k-jinx.jpg fill scale 2

@@ -201,6 +201,7 @@ install_graphics_audio_and_others () {
   pacman -S nautilus --noconfirm
   pacman -S mlocate --noconfirm
   pacman -S termite --noconfirm
+  pacman -S sudo --noconfirm
   # To take screenshot in a wayland compositor
   pacman -S grim --noconfirm
   pacman -S slurp --noconfirm
@@ -216,6 +217,7 @@ install_graphics_audio_and_others () {
 install_networking () {
   title "Network Package Installation"
 
+  pacman -S dhcpcd --noconfirm
   pacman -S iwd net-tools --noconfirm
   pacman -S tor --noconfirm
   pacman -S proxychains-ng --noconfirm
@@ -345,6 +347,13 @@ set hlsearch
   return $SUCCESS
 }
 
+setup_autologin() {
+  sed -i -e "s/\\\//g" \
+         -e "s#'-p -- u' \-\-noclear \%I \$TERM##g" \
+         -e "s#ExecStart=\-/sbin/agetty \-o#ExecStart=\-/usr/bin/agetty \-\-autologin ${NORMAL_USER} \-\-noclear \%I \$TERM#g" \
+  /etc/systemd/system/getty.target.wants/getty@tty1.service
+}
+
 main () {
   update_pacman
   sleep_clear 2
@@ -391,8 +400,10 @@ main () {
   update_configs
   sleep_clear 2
 
-  user_bat_monitor
-  sleep_clear 2
+  setup_autologin
+
+  #user_bat_monitor
+  #sleep_clear 2
 
   # This is for mlocate
   updatedb

@@ -3,7 +3,7 @@
 **I DESIGNED THIS FOR ME AND ONLY ME**
 
 ```
-git clone htttps://github.com/EasyIP2023/arch-linux-install-script.git
+git clone https://github.com/EasyIP2023/arch-linux-install-script.git
 ```
 
 **Before arch-chroot**
@@ -29,9 +29,6 @@ pacman -S wget git curl --noconfirm
 
 **After arch-chroot**
 ```
-# Replace ExecStart=... with ExecStart=-/usr/bin/agetty --autologin <username> --noclear %I $TERM
-vim /mnt/etc/systemd/system/getty.target.wants/getty@tty1.service
-
 umount -Rv /mnt
 cryptsetup close r00t
 ```
