@@ -183,6 +183,9 @@ Label arch
   INITRD ../initramfs-linux.img
 " > /boot/syslinux/syslinux.cfg
 
+  # Just check if it's correct
+  vim /boot/syslinux/syslinux.cfg
+
   sed -i 's/block filesystems/block encrypt filesystems/g' /etc/mkinitcpio.conf
   pacman -S f2fs-tools btrfs-progs --noconfirm
 
@@ -200,7 +203,7 @@ install_graphics_audio_and_others () {
   pacman -S playerctl --noconfirm
   pacman -S nautilus --noconfirm
   pacman -S mlocate --noconfirm
-  pacman -S termite --noconfirm
+  pacman -S alacritty --noconfirm
   pacman -S sudo --noconfirm
   # To take screenshot in a wayland compositor
   pacman -S grim --noconfirm
@@ -218,16 +221,18 @@ install_networking () {
   title "Network Package Installation"
 
   pacman -S dhcpcd --noconfirm
-  pacman -S iwd net-tools --noconfirm
+  pacman -S net-tools --noconfirm
   pacman -S tor --noconfirm
   pacman -S proxychains-ng --noconfirm
   pacman -S openssh openvpn --noconfirm
+  #pacman -S iwd --noconfirm
 
   # FireWall
   pacman -S ufw --noconfirm
 
-  systemctl enable iwd.service
+  #systemctl enable iwd.service
   systemctl enable systemd-resolved.service
+  systemctl enable systemd-networkd.service
 
   return $SUCCESS
 }
@@ -343,6 +348,16 @@ set showmatch
 set incsearch
 set hlsearch
 " >> /etc/vimrc
+
+  ether_iterface_name=$(ifconfig -a | head -n1 | awk '{print $1}' | sed "s/://g")
+  echo "
+[Match]
+Name=${ether_iterface_name}
+
+[Network]
+DHCP=yes
+" > /etc/systemd/network/20-wired.network
+
 
   return $SUCCESS
 }
