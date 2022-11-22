@@ -49,10 +49,6 @@ LIB_X86_STEAM_RUNTIME=/home/vince/.local/share/Steam/ubuntu12_32/steam-runtime/u
 LIB_X86_STEAM=/home/vince/.local/share/Steam/ubuntu12_32/steam-runtime/lib/x86_64-linux-gnu/
 export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:$WB_SOS:$LIB_X86_STEAM_RUNTIME:$LIB_X86_STEAM
 
-LUC_DIR=$(locate lucurious/ | head -n1 | grep -Eo '.+?(lucurious)')
-LUC_IBUILD=$LUC_DIR/ibuild
-alias luc_install='cur_dir=$(pwd) && cd $LUC_DIR && sudo meson --wipe $LUC_IBUILD && sudo ninja install -C $LUC_IBUILD && cd $cur_dir'
-alias luc_uninstall='sudo ninja uninstall -C $LUC_IBUILD'
 alias bat='acpi -b | cut -d "," -f2'
 alias disk_mem='df -h /dev/mapper/r00t && echo && df -h /dev/mapper/storage'
 
