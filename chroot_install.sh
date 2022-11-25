@@ -225,6 +225,7 @@ install_networking () {
   pacman -S tor --noconfirm
   pacman -S proxychains-ng --noconfirm
   pacman -S openssh openvpn --noconfirm
+  pacman -S perl-io-socket-ssl perl-authen-sasl --noconfirm
   #pacman -S iwd --noconfirm
 
   # FireWall
