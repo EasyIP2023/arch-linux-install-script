@@ -245,7 +245,7 @@ install_virtul_soft () {
 
 install_de () {
   title "Installing Desktop Environment"
-  pacman -S sway i3-gaps --noconfirm
+  pacman -S sway swaybg i3-gaps --noconfirm
   return $SUCCESS
 }
 
