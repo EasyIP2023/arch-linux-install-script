@@ -1,0 +1,28 @@
+colors:
+  # Default colors
+  primary:
+    background: '#000000'
+    foreground: '#00FFFF'
+
+font:
+  normal:
+    family: monospace
+    style: Regular
+
+  bold:
+    family: monospace
+    style: Bold
+
+  italic:
+    family: monospace
+    style: Italic
+
+  bold_italic:
+    family: monospace
+    style: Bold Italic
+
+  size: 15
+
+opacity: 0.6
+transparent_background_colors: true
+
