@@ -305,6 +305,8 @@ install_sublime_text() {
 copy_configs () {
   title "Copying Configs"
 
+  git clone https://github.com/eendroroy/alacritty-theme.git /home/$NORMAL_USER/.alacritty-colorscheme
+
   cp -rv .config /home/$NORMAL_USER
   cp -v .bashrc /home/$NORMAL_USER
   cp -v .bashrc /root
@@ -318,6 +320,7 @@ copy_configs () {
 
   chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/.config
   chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/Pictures
+  chown -Rv $NORMAL_USER:users /home/$NORMAL_USER/.alacritty-colorscheme
   chown -v $NORMAL_USER:users /home/$NORMAL_USER/.bashrc
   chown -v $NORMAL_USER:users /home/$NORMAL_USER/.bash_profile
 

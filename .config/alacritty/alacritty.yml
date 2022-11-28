@@ -1,3 +1,6 @@
+import:
+  - ~/.alacritty-colorscheme/themes/hyper.yaml
+
 colors:
   # Default colors
   primary:
