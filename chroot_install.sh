@@ -197,7 +197,7 @@ install_graphics_audio_and_others () {
 
   pacman -S wayland wayland-protocols libinput xorg-server-xwayland --noconfirm
   pacman -S evince --noconfirm
-  pacman -S alsa alsa-utils pulseaudio pulseaudio-alsa --noconfirm
+  pacman -S alsa alsa-utils --noconfirm
   pacman -S bluez bluez-utils pulseaudio-bluetooth --noconfirm
   pacman -S brightnessctl --noconfirm
   pacman -S playerctl --noconfirm
